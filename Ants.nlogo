@@ -9,9 +9,9 @@ breed [nests nest]  ; Ninho pras formigas
 ; Variáveis dos patches (espaço onde as formigas se movem)
 patches-own [
   chemical             ; quantidade de feromônio neste patch
-    chemical2             ; quantidade de feromônio neste patch das formigas 2 (nem ferrando que esse é um jeito bom de fazer isso que CRIME jesus)
-    chemical3             ; quantidade de feromônio neste patch das formigas 3
-    chemical4            ; quantidade de feromônio neste patch das formigas 4
+  chemical2             ; quantidade de feromônio neste patch das formigas 2 (nem ferrando que esse é um jeito bom de fazer isso que CRIME jesus)
+  chemical3             ; quantidade de feromônio neste patch das formigas 3
+  chemical4            ; quantidade de feromônio neste patch das formigas 4
   food                 ; quantidade de comida neste patch (0, 1 ou 2)
   nest?                ; verdadeiro se o patch é parte do ninho, falso caso contrário
   nest2?               ; verdadeiro se o patch é parte do ninho, falso caso contrário
@@ -37,7 +37,7 @@ to setup
    set-default-shape soldier-ants "bug"       ; define o formato das formigas como "inseto"
    set-default-shape queen-ants "bug"       ; define o formato das formigas como "inseto"
   ;repeat 4 [
-    let colony-colors [violet blue 126 yellow] ; Cada ninho tem uma cor única
+  let colony-colors [violet blue 126 yellow] ; Cada ninho tem uma cor única
     foreach colony-colors [colony-color ->
   create-worker-ants population [           ; cria formigas com base no valor do slider 'population'
     set carrying-food false
@@ -160,69 +160,21 @@ to aplicar-atributos ;[violet blue 126 yellow] [energy life strenght speed] bote
     set mutation "no"
   ]
 end
-to setup-nest  ; procedimento dos patches
-;Código abaixo para criar nests como patches, e não turtles.
+to setup-nest  ;; patch procedure
     set nest? false
     set nest2? false
     set nest3? false ;Sem isso daqui dá um erro tenebroso n sei pq
     set nest4? false
- ;coordenadas
-  let corner-x1 -16
-  let corner-x2 40
-  let corner-x3 -30  ;coordenadas dos nests 1 a 4, sendo o x o Eixo X e o y o Eixo Y
-  let corner-x4 26
-  let corner-y1 -36
-  let corner-y2 -32
-  let corner-y3 36
-  let corner-y4 47
-
-  ; Para cada um dos cantos, cria um ninho
-    ; Para cada patch, verificamos se ele está dentro de um raio de 5 unidades de um dos 4 cantos
-    if (distancexy corner-x1 corner-y1) < 5 [
-      set nest? true
-      set nest-scent 400 - distancexy corner-x1 corner-y1
-    ]
-   if (distancexy corner-x2 corner-y2) < 5 [
-      set nest2? true
-      set nest-scent2 400 - distancexy corner-x2 corner-y2
-    ]
-    if (distancexy corner-x3 corner-y3) < 5 [
-      set nest3? true
-      set nest-scent3 400 - distancexy corner-x3 corner-y3
-    ]
-    if (distancexy corner-x4 corner-y4) < 5 [
-      set nest4? true
-      set nest-scent4 400 - distancexy corner-x4 corner-y4
-    ]
-   ; Cria as turtles (ninhos)
-;  create-turtles 4 [
-    ; Defina as coordenadas dos ninhos nos quatro cantos
-   ; let corner-x random-xcor  ; Para fazer os ninhos em posições aleatórias
-   ; let corner-y random-ycor
-   ;; set size 8
-    ;set shape "circle"
-
-    ;setxy corner-x corner-y ; Posiciona as turtles nos pontos aleatórios
-
-    ; Defina uma variável para cada ninho
-   ; set nest-scent 200 - distancexy corner-x corner-y ; Inicializa o valor do cheiro
-   ; set label "Ninho"  ; Definir um rótulo para visualização se necessário
-
-    ; Para cada uma das turtles, defina uma cor para os ninhos, apenas para visualização
-   ; if (who = 0) [
-    ;  set color white ; O primeiro ninho será vermelho
-   ; ]
-   ; if (who = 1) [
-    ;  set color white ; O segundo ninho será verde
-    ;]
-    ;if (who = 2) [
-    ;  set color white ; O terceiro ninho será azul
-    ;]
-    ;if (who = 3) [
-    ;  set color white ; O quarto ninho será amarelo
-    ;]
-  ;]
-
+  ;; set nest? variable to true inside the nest, false elsewhere
+  set nest? (distancexy -16 -36) < 5
+  set nest2? (distancexy 40 -32) < 5
+  set nest3? (distancexy -30 36) < 5
+  set nest4? (distancexy 26 47) < 5
+  ;; spread a nest-scent over the whole world -- stronger near the nest
+  set nest-scent 400 - distancexy -16 -36
+   set nest-scent2 400 - distancexy 40 -32
+   set nest-scent3 400 - distancexy -30 36
+   set nest-scent4 400 - distancexy 26 47
 end
 
 to setup-food  ; procedimento dos patches Isso daqui gera em posições específicas, coisa que eu não quero. Melhor começar do 0
@@ -232,7 +184,7 @@ to setup-food  ; procedimento dos patches Isso daqui gera em posições específ
   ]
   ask turtles with [shape = "tree"] [
     ; Para cada árvore, define patches ao redor como fontes de alimento
-    let nearby-patches patches in-radius 8 ; Ajuste o raio conforme necessário
+    let nearby-patches patches in-radius 9 ; Ajuste o raio conforme necessário
     ask nearby-patches [
       if random 100 < 50 [ ; 50% de chance de gerar comida em cada patch ao redor
         set food one-of [1 2] ; Define quantidade de comida aleatória (1 ou 2)
@@ -283,13 +235,7 @@ to recolor-patch  ; procedimento dos patches
       if max-chemical = chemical3 [ set pcolor scale-color 137 chemical3 0.1 5 ] ;magenta é daqui pra lá pra rosa.
       if max-chemical = chemical4 [ set pcolor scale-color 48 chemical4 0.1 5 ] ; amarelo n tem pra onde fugir n, netlogo n tem muitas cores de amarelo .-.
       ]
-    ]
-
-      ;set pcolor scale-color 117 chemical 0.1 5  ;violeta claro (decidi deixar os feromonios relacionados com as cores pra n ficar um inferno na tela)
-     ; set pcolor scale-color cyan chemical2 0.1 5 ;variação de azul
-     ; set pcolor scale-color 137 chemical3 0.1 5 ;magenta é daqui pra lá pra rosa. modo antigo de botar feromonio, tava dando erro.
-     ; set pcolor scale-color 48 chemical4 0.1 5 ; amarelo n tem pra onde fugir n, netlogo n tem muitas cores de amarelo .-.
-    ]
+  ]]
     if nest2? [
     set pcolor blue                  ; patches do ninho em  azul (ninho 2)
   ]
@@ -308,18 +254,22 @@ end
 
 to go
   ask worker-ants [
-    let colony-colors [violet blue 126 yellow] ; Cada ninho tem uma cor única
-    if ticks <= 50 [ stop ]             ; sincroniza a saída das formigas do ninho com o tempo
-    if ticks > (ticks - ticks mod 4) and ticks mod 4 = 2 [
-     ifelse color = colony-colors [
-      if colony = violet [ return-to-nest ]
-      if colony = blue [ return-to-nest2 ]
-      if colony = 126 [ return-to-nest3 ]
-      if colony = yellow [ return-to-nest4 ]
-    ] [
-      look-for-food  ; Executa busca por comida
-    ]
-  ]
+    if colony = blue[
+     if ticks < (ticks - ticks mod 4) and ticks mod 4 != 2 [stop]     ; sincroniza a saída das formigas do ninho com o tempo para qur todas saiam juntas
+     ifelse color = blue ; erro resolvido.
+        [look-for-food2 ] [ return-to-nest2 ]] ; diz pra procurar comida ou voltar pro ninho.
+    if colony = violet[
+      if ticks < (ticks - ticks mod 4) and ticks mod 4 != 2 [stop]       ; sincroniza a saída das formigas do ninho com o tempo para qur todas saiam juntas
+        ifelse color = violet [look-for-food ] [ return-to-nest ]]
+    if colony = 126[
+      if ticks < (ticks - ticks mod 4) and ticks mod 4 != 2 [stop]
+       ifelse color = 126 ;cor da formiga normal
+        [look-for-food3 ] [ return-to-nest3 ]]
+    if colony = yellow[
+       if ticks < (ticks - ticks mod 4) and ticks mod 4 != 2 [stop]
+       ifelse color = yellow
+        [look-for-food4 ] [ return-to-nest4 ]]
+
     wiggle                               ; movimento aleatório para simular procura
     fd 1                                 ; move-se para frente
     set energy energy - 2                ; Diminui a energia delas
@@ -344,109 +294,90 @@ end
 ; === COMPORTAMENTOS DAS FORMIGAS ===
 
 to look-for-food  ; procedimento das formigas
-  if not carrying-food [
-    if food > 0 [  ; Verifica se o patch tem comida
-      set carrying-food true
-      set food food - 1         ; Reduz a comida no patch
-      if colony = violet [
-        set color orange + 1    ; Muda cor para indicar carregamento
-        set chemical chemical + 80 ; Libera feromônio específico
-      ]
-      if colony = blue [
-        set color sky + 1
-        set chemical2 chemical2 + 80
-      ]
-      if colony = 126 [
-        set color 136 + 1
-        set chemical3 chemical3 + 80
-      ]
-      if colony = yellow [
-        set color yellow + 2
-        set chemical4 chemical4 + 80
-      ]
-      rt 180  ; Vira para retornar ao ninho
-      stop    ; Encerra o procedimento, inicia `return-to-nest` no próximo ciclo
-    ]
-    if colony = violet[
-    ifelse (chemical >= 0.05) and (chemical < 2) [
-    uphill-chemical                     ; segue o rastro de feromônio
-  ][
-      wiggle                              ; Movimento randômico se não houver feromônio
-      fd 1                                ; Avança um passo
-    ]]
-     if colony = blue[
-    ifelse (chemical2 >= 0.05) and (chemical2 < 2) [
-    uphill-chemical2                     ; segue o rastro de feromônio do tipo específico deles
-  ][
-      wiggle                              ; Movimento randômico se não houver feromônio
-      fd 1                                ; Avança um passo
-    ]]
-     if colony = 126[
- ifelse (chemical3 >= 0.05) and (chemical3 < 2) [
-    uphill-chemical3                     ; segue o rastro de feromônio do tipo específico deles
-  ][
-      wiggle                              ; Movimento randômico se não houver feromônio
-      fd 1                                ; Avança um passo
-    ]]
-     if colony = yellow[
-    ifelse (chemical4 >= 0.05) and (chemical4 < 2) [
-    uphill-chemical4                     ; segue o rastro de feromônio do tipo específico deles
-  ][
-      wiggle                              ; Movimento randômico se não houver feromônio
-      fd 1                                ; Avança um passo
-    ]
-
-  ]]
-
+  if food > 0
+  [ set color violet + 1     ;; pick up food
+    set food food - 1        ;; and reduce the food source
+    rt 180                   ;; and turn around
+    stop ]
+    ;; go in the direction where the chemical smell is strongest
+  if (chemical >= 0.05) and (chemical < 2)
+  [ uphill-chemical ]
+end
+to look-for-food2  ; procedimento das formigas
+      if food > 0
+  [ set color sky + 1    ;; pick up food
+    set food food - 1        ;; and reduce the food source
+    rt 180                   ;; and turn around
+    stop ]
+    ;; go in the direction where the chemical smell is strongest
+  if (chemical2 >= 0.05) and (chemical2 < 2)
+  [ uphill-chemical2 ]
+end
+to look-for-food3  ; procedimento das formigas
+if food > 0[
+  set color 136 + 1
+  set food food - 1        ;; and reduce the food source
+    rt 180                   ;; and turn around
+    stop ]
+    ;; go in the direction where the chemical smell is strongest
+  if (chemical3 >= 0.05) and (chemical3 < 2)
+  [ uphill-chemical3 ]
+end
+to look-for-food4 ; procedimento das formigas
+if food > 0[
+  set color yellow + 2
+  set food food - 1        ;; and reduce the food source
+    rt 180                   ;; and turn around
+    stop ]
+    ;; go in the direction where the chemical smell is strongest
+  if (chemical4 >= 0.05) and (chemical4 < 2)
+  [ uphill-chemical4 ]
 end
 
 to return-to-nest
-  if carrying-food [
     ifelse nest? [
       set color violet                  ; Deposita comida e volta à cor original
-      set carrying-food false           ; Indica que não está mais carregando comida
+
       rt 180
     ] [
-      set chemical chemical + 80        ; Libera feromônio no caminho
+      set chemical chemical + 60        ; Libera feromônio no caminho
       uphill-nest-scent                 ; Move-se na direção do ninho
     ]
-  ]
+
 end
 to return-to-nest2
-  if carrying-food [
     ifelse nest2? [
       set color blue                    ; Deposita comida e volta à cor original
-      set carrying-food false           ; Indica que não está mais carregando comida
+
       rt 180
     ] [
-      set chemical2 chemical2 + 80      ; Libera feromônio no caminho
+      set chemical2 chemical2 + 60      ; Libera feromônio no caminho
       uphill-nest-scent2                ; Move-se na direção do ninho
     ]
-  ]
+
 end
 to return-to-nest3
-  if carrying-food [
     ifelse nest3? [
       set color 126                     ; Deposita comida e volta à cor original
-      set carrying-food false           ; Indica que não está mais carregando comida
+                ; Indica que não está mais carregando comida
       rt 180
     ] [
-      set chemical3 chemical3 + 80      ; Libera feromônio no caminho
+      set chemical3 chemical3 + 60      ; Libera feromônio no caminho
       uphill-nest-scent3                ; Move-se na direção do ninho
     ]
-  ]
+
 end
 to return-to-nest4
-  if carrying-food [
+
     ifelse nest4? [
       set color yellow                  ; Deposita comida e volta à cor original
-      set carrying-food false           ; Indica que não está mais carregando comida
+
       rt 180
     ] [
-      set chemical4 chemical4 + 80      ; Libera feromônio no caminho
+      set chemical4 chemical4 + 60      ; Libera feromônio no caminho
       uphill-nest-scent4                ; Move-se na direção do ninho
     ]
-  ]
+
 end
 
 
@@ -506,51 +437,40 @@ to uphill-chemical3  ; procedimento das formigas
   let scent-ahead chemical-scent-at-angle3 0
   let scent-right chemical-scent-at-angle3 45
   let scent-left chemical-scent-at-angle3 -45
-   if (scent-ahead > 0) or (scent-right > 0) or (scent-left > 0) [
-  ifelse (scent-right > scent-ahead) or (scent-left > scent-ahead) [
+
+  if(scent-right > scent-ahead) or (scent-left > scent-ahead) [
     ifelse scent-right > scent-left [
       rt random 30 + 30 ; Ajusta ângulo para seguir o gradiente à direita
     ] [
       lt random 30 + 30 ; Ajusta ângulo para seguir o gradiente à esquerda
     ]
   ]
-  [
-    wiggle  ; Movimento randômico se não houver feromônio detectado
-    fd 1
-  ]
-  ]
+
 end
 
 to uphill-chemical4  ; procedimento das formigas
   let scent-ahead chemical-scent-at-angle4 0
   let scent-right chemical-scent-at-angle4 45
   let scent-left chemical-scent-at-angle4 -45
-    if (scent-ahead > 0) or (scent-right > 0) or (scent-left > 0) [
-  ifelse (scent-right > scent-ahead) or (scent-left > scent-ahead) [
+
+  if (scent-right > scent-ahead) or (scent-left > scent-ahead) [
     ifelse scent-right > scent-left [
       rt random 30 + 30 ; Ajusta ângulo para seguir o gradiente à direita
     ] [
       lt random 30 + 30 ; Ajusta ângulo para seguir o gradiente à esquerda
     ]
-  ]
-  [
-    wiggle  ; Movimento randômico se não houver feromônio detectado
-    fd 1
-  ]
+
   ]
 end
 
-to uphill-nest-scent  ; procedimento das formigas
-  let scent-ahead nest-scent-at-angle 0
-  let scent-right nest-scent-at-angle 45
-  let scent-left nest-scent-at-angle -45
-  if (scent-right > scent-ahead) or (scent-left > scent-ahead) [
-    ifelse scent-right > scent-left [
-      rt 45                              ; vira 45 graus à direita
-    ] [
-      lt 45                              ; vira 45 graus à esquerda
-    ]
-  ]
+to uphill-nest-scent  ;; turtle procedure
+  let scent-ahead nest-scent-at-angle   0
+  let scent-right nest-scent-at-angle  45
+  let scent-left  nest-scent-at-angle -45
+  if (scent-right > scent-ahead) or (scent-left > scent-ahead)
+  [ ifelse scent-right > scent-left
+    [ rt 45 ]
+    [ lt 45 ] ]
 end
 to uphill-nest-scent2  ; procedimento das formigas
   let scent-ahead nest-scent-at-angle2 0
@@ -702,7 +622,7 @@ diffusion-rate
 diffusion-rate
 0.0
 99.0
-51.0
+50.0
 1.0
 1
 NIL
@@ -741,10 +661,10 @@ NIL
 0
 
 SLIDER
-31
 36
-221
-69
+23
+226
+56
 population
 population
 0.0
