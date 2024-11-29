@@ -165,7 +165,8 @@ to aplicar-atributos ;[violet blue 126 yellow] [energy life strenght speed] bote
     set mutation "no"
   ]
 end
-to setup-nest  ;; patch procedure
+
+to setup-nest  ; procedimento dos patches  ;Código abaixo para criar nests como patches, e não turtles.
     set nest? false
     set nest2? false
     set nest3? false ;Sem isso daqui dá um erro tenebroso n sei pq
