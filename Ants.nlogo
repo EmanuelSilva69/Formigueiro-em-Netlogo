@@ -6,6 +6,8 @@ breed [soldier-ants soldier-ant] ; Formigas Guerreiras
 breed [queen-ants queen-ant] ; Formigas rainha
 breed [trees tree] ; Arvore
 breed [nests nest]  ; Ninho pras formigas
+breed [tamanduas tamandua] ; predador tamandua
+breed [pangolims pangolim] ; predador pangolim todo fofinho
 ; Variáveis dos patches (espaço onde as formigas se movem)
 patches-own [
   chemical             ; quantidade de feromônio neste patch
@@ -24,9 +26,9 @@ patches-own [
   food-source-number   ; identifica as fontes de alimento (1, 2 ou 3)
 ]
 ; Forma da Formiga ter energia e morrer, além dos atributos que eu criei
-worker-ants-own [energy colony life strenght mutation speed carrying-food]
-soldier-ants-own [energy colony life strenght mutation speed]
-queen-ants-own [energy colony life strenght mutation speed]
+worker-ants-own [energy colony life strenght mutation speed  vitima]
+soldier-ants-own [energy colony life strenght mutation speed role vitima]
+queen-ants-own [energy colony life strenght mutation speed vitima]
 trees-own [energy]
 ; === PROCEDIMENTOS DE CONFIGURAÇÃO ===
 to setup
@@ -40,7 +42,7 @@ to setup
   let colony-colors [violet blue 126 yellow] ; Cada ninho tem uma cor única
     foreach colony-colors [colony-color ->
   create-worker-ants population [           ; cria formigas com base no valor do slider 'population'
-    set carrying-food false
+    set vitima false
     set size 1                          ; tamanho base
     set color colony-color                       ; vermelho indica que não está carregando comida
     set energy 1000                       ; da a energia da formiga
@@ -48,10 +50,12 @@ to setup
     aplicar-atributos
   ]
     create-soldier-ants 10 [
+    set vitima false
     set size 2                          ; aumenta o tamanho para melhor visualização
     set color colony-color + 3                      ; formiga soldado é magenta (tirei a cor do site lá) um pouco diferente do trabalhador
     set energy 1000                       ; da a energia da formiga
     set colony colony-color ; atribui a colônia
+    set role "Patrulha"
     aplicar-atributos
   ]
     create-trees 2 [
@@ -63,6 +67,7 @@ to setup
 
   ]
     create-queen-ants 1 [
+    set vitima false
     set size 3                         ; aumenta o tamanho para melhor visualização
     set color (colony-color - 2)                       ; formiga soldado é magenta (tirei a cor do site lá)
     set energy 1000000                  ; da a energia da formiga
@@ -274,7 +279,37 @@ to go
     fd 1                                 ; move-se para frente
     set energy energy - 2                ; Diminui a energia delas
   ]
-
+  ask soldier-ants [
+    if colony = violet[
+    if ticks < (ticks - ticks mod 4) and ticks mod 4 != 2 [stop]
+    if color = violet + 3
+     [ patrulha-ou-luta
+        movimento-soldado]
+     set energy energy - 1
+    ]
+    if colony = blue[
+    if ticks < (ticks - ticks mod 4) and ticks mod 4 != 2 [stop]
+     if color = blue + 3[
+     patrulha-ou-luta
+        movimento-soldado2]
+        set energy energy - 1
+    ]
+    if colony = 126[
+    if ticks < (ticks - ticks mod 4) and ticks mod 4 != 2 [stop]
+     if color = 126 + 3[
+     patrulha-ou-luta
+        movimento-soldado3]
+     set energy energy - 1
+    ]
+    if colony = yellow[
+    if ticks < (ticks - ticks mod 4) and ticks mod 4 != 2 [stop]
+ if color = yellow + 3[
+      patrulha-ou-luta
+        movimento-soldado4]
+     set energy energy - 1
+    ]
+  ]
+  ask queen-ants []
  diffuse chemical (diffusion-rate / 100) ;difusão dos feromonios
   diffuse chemical2 (diffusion-rate / 100)
   diffuse chemical3 (diffusion-rate / 100)
@@ -392,7 +427,21 @@ to check-death ;ver se a formiga vai morrer
     if energy <= 0 [ die ]
   ]
 end
+to patrulha-ou-luta
+  ifelse any? other turtles with [ (breed != trees) and ;;pra impedir as formigas de atacarem as arvores
+  (breed = worker-ants or breed = soldier-ants or breed = queen-ants or breed = pangolims or breed = tamanduas) and
+  (colony != [colony] of myself) and  (distance myself < 30)]
+     [
+    set role "fighting"      ];; Muda o trabalho para Modo Lutador, pra meter a porrada nos trabalhadores inocentes (que nem a vida real)
+     [
+    set role "patrolling"    ;; Caso n veja nenhum inimigo, continuar patrulhando o ninho original.
+  ]
 
+end
+to attack ;começar a fazer o Combate das formigas
+
+
+end
 ; === MOVIMENTAÇÃO E ORIENTAÇÃO === ME perdoe por esse crime que vocês vão ver
 
 to uphill-chemical  ; procedimento das formigas
@@ -513,6 +562,105 @@ to wiggle  ; procedimento das formigas
   rt random 45                           ; vira um ângulo aleatório à direita
   lt random 45                           ; vira um ângulo aleatório à esquerda
   if not can-move? 1 [ rt 180 ]          ; se não puder se mover, vira 180 graus
+end
+
+to movimento-soldado
+  if role = "patrolling"[
+  let closest-nest one-of patches with [
+    nest? = true and pcolor = violet
+  ]  let nest-x -16  ;; Define the x-coordinate of the nest
+  let nest-y -36  ;; Define the y-coordinate of the nest
+
+  ;; Move in a circular pattern by adjusting the heading randomly and moving forward
+  set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
+  fd 0.5 ;; Move forward
+
+  ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
+  ifelse distancexy nest-x nest-y < 3 [
+    rt random 90  ;; Turn randomly to avoid staying at the same spot
+    fd 0.5        ;; Move forward
+  ][
+    ;; Continue patrolling around the defined spot
+    rt 15  ;; Rotate by a small amount to keep patrolling in a circle
+    fd 0.5    ;; Move forward
+  ]]
+
+
+end
+to movimento-soldado2
+    if role = "patrolling"[
+ let closest-nest one-of patches with [
+    nest? = true and pcolor = blue
+  ]
+  ;; Define a specific spot where the soldier ant will patrol (e.g., the nest location)
+  let nest-x -16  ;; Define the x-coordinate of the nest
+  let nest-y -36  ;; Define the y-coordinate of the nest
+
+
+  ;; Move in a circular pattern by adjusting the heading randomly and moving forward
+  set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
+  fd 0.5  ;; Move forward
+
+  ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
+  ifelse distancexy nest-x nest-y < 3 [
+    rt random 90  ;; Turn randomly to avoid staying at the same spot
+    fd 0.5         ;; Move forward
+  ][
+    ;; Continue patrolling around the defined spot
+    rt 15  ;; Rotate by a small amount to keep patrolling in a circle
+    fd 0.5    ;; Move forward
+  ]]
+end
+to movimento-soldado3
+    if role = "patrolling"[
+  let closest-nest one-of patches with [
+    nest? = true and pcolor = 126
+  ]
+  ;; Define a specific spot where the soldier ant will patrol (e.g., the nest location)
+  let nest-x -16  ;; Define the x-coordinate of the nest
+  let nest-y -36  ;; Define the y-coordinate of the nest
+
+
+  ;; Move in a circular pattern by adjusting the heading randomly and moving forward
+  set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
+  fd 0.5  ;; Move forward
+
+  ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
+  ifelse distancexy nest-x nest-y < 3 [
+    rt random 90  ;; Turn randomly to avoid staying at the same spot
+    fd 0.5         ;; Move forward
+  ][
+    ;; Continue patrolling around the defined spot
+    rt 15  ;; Rotate by a small amount to keep patrolling in a circle
+    fd 0.5    ;; Move forward
+  ]]
+end
+to movimento-soldado4
+    if role = "patrolling"[
+ let closest-nest one-of patches with [
+    nest? = true and pcolor = yellow
+  ]
+  ;; Define a specific spot where the soldier ant will patrol (e.g., the nest location)
+  let nest-x -16  ;; Define the x-coordinate of the nest
+  let nest-y -36  ;; Define the y-coordinate of the nest
+
+
+  ;; Move in a circular pattern by adjusting the heading randomly and moving forward
+  set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
+  fd 0.5  ;; Move forward
+
+  ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
+  ifelse distancexy nest-x nest-y < 3 [
+    rt random 90  ;; Turn randomly to avoid staying at the same spot
+    fd 1         ;; Move forward
+  ][
+    ;; Continue patrolling around the defined spot
+    rt 15  ;; Rotate by a small amount to keep patrolling in a circle
+    fd 0.5    ;; Move forward
+  ]]
+  if role = "fighting"[
+
+  ]
 end
 
 ; === FUNÇÕES AUXILIARES ===
