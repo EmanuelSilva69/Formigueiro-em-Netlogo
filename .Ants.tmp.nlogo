@@ -479,7 +479,7 @@ to nascimento
  if colony = blue[
     ask queen-ants[
     if ticks mod 100 = 0 [  ;; Breed every 10 ticks
-      let num-new-ants nascimentoformiga + random 10  ;; slide do nascimento de formiga + incremento de 0 a 10
+      let num-new-ants nascimentoformiga + random 10  ;; slide do nascimento de formiga + incremento de 0 a 10 ;; fazer nascer de 1 a 9
      hatch-worker-ants num-new-ants [
        setxy 40 -32  ;; Spawnar perto da rainha azul (
       set shape "bug"
@@ -495,7 +495,7 @@ to nascimento
   if colony = 126[
     ask queen-ants[
     if ticks mod 100 = 0 [  ;; Breed every 10 ticks
-      let num-new-ants nascimentoformiga + random 10  ;; slide do nascimento de formiga + incremento de 0 a 10
+      let num-new-ants nascimentoformiga + random 10  ;; slide do nascimento de formiga + incremento de 0 a 10 ;; fazer nascer de 1 a 9
      hatch-worker-ants num-new-ants [
        setxy -30 36  ;; Spawnar perto da rainha magenta
       set shape "bug"
@@ -979,8 +979,8 @@ SLIDER
 nascimentoformiga
 nascimentoformiga
 0
-200
-17.0
+100
+6.0
 1
 1
 NIL
