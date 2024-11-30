@@ -1,6 +1,6 @@
 ; === INSTRUÇÕES ===
 ; === DEFINIÇÃO DE VARIÁVEIS ===
-;Classes das formigas
+globals[current-season seasons]       ;; Estação atual (Primavera, Verão, Outono, Inverno)
 breed [worker-ants worker-ant]  ; Formigas Trabalhadoras
 breed [soldier-ants soldier-ant] ; Formigas Guerreiras
 breed [queen-ants queen-ant] ; Formigas rainha
@@ -42,12 +42,14 @@ to setup
   set-default-shape worker-ants "bug"       ; define o formato das formigas como "inseto"
    set-default-shape soldier-ants "bug"       ; define o formato das formigas como "inseto"
    set-default-shape queen-ants "bug"       ; define o formato das formigas como "inseto"
-  ;repeat 4 [
+   set seasons ["Primavera" "Verão" "Outono" "Inverno"]
+  set current-season one-of seasons
+  print (word "A estação inicial é:  " current-season)
   let colony-colors [violet blue 126 yellow] ; Cada ninho tem uma cor única
     foreach colony-colors [colony-color ->
   create-worker-ants population [           ; cria formigas com base no valor do slider 'population'
     set vitima false
-    set size 1                          ; tamanho base
+    set size 1.5                          ; tamanho base
     set color colony-color                       ; vermelho indica que não está carregando comida
     set energy 1000                       ; da a energia da formiga
     set colony colony-color ; atribui a colônia
@@ -55,7 +57,7 @@ to setup
   ]
     create-soldier-ants popsold [ ;população de soldados
     set vitima false
-    set size 2                          ; aumenta o tamanho para melhor visualização
+    set size 2.5                          ; aumenta o tamanho para melhor visualização
     set color colony-color + 3                      ; formiga soldado é magenta (tirei a cor do site lá) um pouco diferente do trabalhador
     set energy 1000                       ; da a energia da formiga
     set colony colony-color ; atribui a colônia
@@ -72,7 +74,7 @@ to setup
   ]
     create-queen-ants 1 [
     set vitima false
-    set size 3                         ; aumenta o tamanho para melhor visualização
+    set size 4                         ; aumenta o tamanho para melhor visualização
     set color (colony-color - 2)                       ; formiga soldado é magenta (tirei a cor do site lá)
     set energy 1000000                  ; da a energia da formiga
     set colony colony-color ; atribui a colônia
@@ -199,7 +201,7 @@ to setup-food  ; procedimento dos patches Isso daqui gera em posições específ
     ; Para cada árvore, define patches ao redor como fontes de alimento
     let nearby-patches patches in-radius 9 ; Ajuste o raio conforme necessário
     ask nearby-patches [
-      if random 100 < 50 [ ; 50% de chance de gerar comida em cada patch ao redor
+      if random 100 < chancedomida [ ; 50% de chance de gerar comida em cada patch ao redor
         set food one-of [1 2] ; Define quantidade de comida aleatória (1 ou 2)
         set food-source-number [who] of myself ; Identifica a árvore como fonte de alimento
         if food = 1 [ set pcolor red ] ; Comida 1 -> vermelho
@@ -228,8 +230,6 @@ end
 
 
 to recolor-patch  ; procedimento dos patches
-
-
   ifelse nest? [
     set pcolor violet                   ; patches do ninho em violeta
   ] [
@@ -243,11 +243,18 @@ to recolor-patch  ; procedimento dos patches
       let max-chemical max (list chemical chemical2 chemical3 chemical4)
       if max-chemical > 0.01 [  ; só recolore patches com feromônio
 
-       if max-chemical = chemical [ set pcolor scale-color 117 chemical 0.1 5 ] ;violeta claro (decidi deixar os feromonios relacionados com as cores pra n ficar um inferno na tela)
-      if max-chemical = chemical2 [ set pcolor scale-color cyan chemical2 0.1 5 ] ;variação de azul
-      if max-chemical = chemical3 [ set pcolor scale-color 137 chemical3 0.1 5 ] ;magenta é daqui pra lá pra rosa.
-      if max-chemical = chemical4 [ set pcolor scale-color 48 chemical4 0.1 5 ] ; amarelo n tem pra onde fugir n, netlogo n tem muitas cores de amarelo .-.
+       if max-chemical = chemical [ set pcolor scale-color 117 chemical -11 60 ] ;violeta claro (decidi deixar os feromonios relacionados com as cores pra n ficar um inferno na tela)
+      if max-chemical = chemical2 [ set pcolor scale-color cyan chemical2 -11 60 ] ;variação de azul
+      if max-chemical = chemical3 [ set pcolor scale-color 137 chemical3 -11 60 ] ;magenta é daqui pra lá pra rosa.
+      if max-chemical = chemical4 [ set pcolor scale-color 48 chemical4 -11 60 ] ; amarelo n tem pra onde fugir n, netlogo n tem muitas cores de amarelo .-.
       ]
+      if max-chemical < 0.01 [
+      ;; Reset to the base color of the current season
+      if current-season = "Primavera" [ set pcolor 63 ]
+      if current-season = "Verão" [ set pcolor 43 ]
+      if current-season = "Outono" [ set pcolor 23 ]
+      if current-season = "Inverno" [ set pcolor white ]
+    ]
   ]]
     if nest2? [
     set pcolor blue                  ; patches do ninho em  azul (ninho 2)
@@ -318,8 +325,39 @@ to go
     ]
   ]
   ask queen-ants [
-   nascimento
-    ]
+  ;tamanhoseason tamamho de cada season
+ if (ticks mod tamanhoseason = 0)[
+    if colony = violet[
+      if color = violet - 2 [
+      let total-food sum [food-store] of patches
+      if total-food > Preçoconstrução [ ; preço para subtrair da comida para gerar formiga
+      nascimento
+      set food-store food-store - Preçoconstrução
+    ]]]
+    if colony = blue[
+      if color = blue - 2 [
+      let total-food2 sum [food-store2] of patches
+      if total-food2 > Preçoconstrução [
+      nascimento
+      set food-store2 food-store2 - Preçoconstrução
+    ]]]
+    if colony = 126[
+
+      if color = 126 - 2 [
+      let total-food3 sum [food-store3] of patches
+      if total-food3 > Preçoconstrução [
+      nascimento
+      set food-store3 food-store3 - Preçoconstrução
+    ]]
+       ]
+    if colony = yellow[
+      if color = yellow - 2 [
+       let total-food4 sum [food-store4] of patches
+      if total-food4 > Preçoconstrução [
+      nascimento
+      set food-store4 food-store4 - Preçoconstrução
+  ]]]
+   ]]
 
 
 
@@ -336,8 +374,9 @@ to go
     recolor-patch ; atualiza as cores após mudança
   ]
   check-death
-
+  handle-season-change
   tick                                  ; avança o contador de tempo da simulação
+
 end
 
 ; === COMPORTAMENTOS DAS FORMIGAS ===
@@ -461,68 +500,103 @@ to kill-nestvazia ;acabar com as nests vazias.
 end
 to nascimento
  if colony = violet[
-    ask queen-ants[
-    if ticks mod 100 = 0 [  ;; Fazer nascer as formigas a cada 100 ticks. MUDAR DEPOIS PARA MUDANÇA CLIMATICA
       let num-new-ants nascimentoformiga + random 10  ;; slide do nascimento de formiga + incremento de 0 a 10  aleatório ->
      hatch-worker-ants num-new-ants [
       setxy -16 -36  ;; Spawnar perto da rainha violeta
       set shape "bug"
       set color violet
       set energy 10
-      set size 1
+      set size 1.5
       set colony violet
      ; mover-formiga ;; Spawnar perto da rainha violeta
       aplicar-atributos
-      ]]
+      ]
+    hatch-soldier-ants random 5 [
+      setxy -18 -38  ;; Spawnar perto da rainha violeta
+      set shape "bug"
+      set color violet + 3
+      set energy 10
+      set size 2.5
+      set colony violet
+      aplicar-atributos
     ]
   ]
+
  if colony = blue[
     ask queen-ants[
-    if ticks mod 100 = 0 [  ;; Breed every 10 ticks
-      let num-new-ants nascimentoformiga + random 10  ;; slide do nascimento de formiga + incremento de 0 a 10
+      let num-new-ants random 9 + 1  ;; fazer nascer de 1 a 9
      hatch-worker-ants num-new-ants [
        setxy 40 -32  ;; Spawnar perto da rainha azul (
       set shape "bug"
       set color blue
-      set energy 10
-      set size 1
+      set energy 100
+      set size 1.5
       set colony blue
     ;  mover-formiga ;; Spawnar perto da rainha azul -> trava em todo spawn por meio segundo, fica ruim logo n vou utilizar, já que o spawn especifico é mais leve no programa.
       aplicar-atributos
-      ]]
+      ]
+       hatch-soldier-ants random 5 [ ;aleatório pra n ficar quebrado.
+      setxy 39 -34  ;; Spawnar perto da rainha violeta
+      set shape "bug"
+      set color blue + 3
+      set energy 1000
+      set size 2.5
+      set colony blue
+      aplicar-atributos
     ]
-  ]
+]]
+
   if colony = 126[
     ask queen-ants[
-    if ticks mod 100 = 0 [  ;; Breed every 10 ticks
-      let num-new-ants nascimentoformiga + random 10  ;; slide do nascimento de formiga + incremento de 0 a 10
+
+      let num-new-ants random 9 + 1  ;; fazer nascer de 1 a 9
      hatch-worker-ants num-new-ants [
        setxy -30 36  ;; Spawnar perto da rainha magenta
       set shape "bug"
       set color 126
       set energy 10
-      set size 1
+      set size 1.5
           set colony 126
         ;mover-formiga ;; Spawnar perto da rainha magenta
       aplicar-atributos
-      ]]
+    ]  hatch-soldier-ants random 5 [
+      setxy -28 35  ;; Spawnar perto da rainha violeta
+      set shape "bug"
+      set color 126 + 3
+      set energy 1000
+      set size 2.5
+      set colony 126
+      aplicar-atributos
+    ]
     ]
   ]
+
+
   if colony = yellow[
     ask queen-ants[
-    if ticks mod 100 = 0 [  ;; Breed every 10 ticks
-      let num-new-ants nascimentoformiga + random 10  ;; slide do nascimento de formiga + incremento de 0 a 10
+
+      let num-new-ants random 9 + 1  ;; fazer nascer de 1 a 9
      hatch-worker-ants num-new-ants [
            setxy 26 47  ;; Spawnar perto da rainha amarela
       set shape "bug"
       set color yellow
       set energy 10
-      set size 1
+      set size 1.5
       set colony yellow
       aplicar-atributos
-      ]]
-    ]
   ]
+       hatch-soldier-ants random 5 [
+      setxy 28 45  ;; Spawnar perto da rainha violeta
+      set shape "bug"
+      set color yellow + 3
+      set energy 1000
+      set size 2.5
+      set colony yellow
+      aplicar-atributos
+    ]
+  ]]
+
+
 end
 ; === MOVIMENTAÇÃO E ORIENTAÇÃO === ME perdoe por esse crime que vocês vão ver
 
@@ -787,6 +861,117 @@ to-report chemical-scent-at-angle4 [angle]
   if p = nobody [ report 0 ]             ; se não houver patch, retorna 0
   report [chemical4] of p                 ; retorna o valor de 'chemical' do patch
 end
+;=== Funções de alteração do clima ===
+to handle-season-change
+  if (ticks mod tamanhoseason = 0) [ ; variável que permite a mudança climática
+    ;; Atualiza a estação
+     let current-index position current-season seasons
+     let next-index (current-index + 1) mod length seasons ;pega a próxima estação da lista lá de cima  set seasons ["Primavera" "Verão" "Outono" "Inverno"]
+    set current-season item next-index seasons ; Vai pra próxima estação
+    ;if current-season = "Primavera" [ set current-season "Verão" ]
+   ;  if current-season = "Verão" [ set current-season "Outono" ]
+    ; if current-season = "Outono" [ set current-season "Inverno" ]
+    ; if current-season = "Inverno" [ set current-season "Primavera" ]
+
+    ;; Altera o mapa com base na nova estação
+    update-patches-for-season ; função de atualizar somente os pactches. N quis botar no recolor patches pra n ficar muita coisa ali e se der erro n dar muito problema.
+    update-trees
+  ]
+end
+to update-patches-for-season
+
+  ask patches [
+    if current-season = "Primavera" [
+     if pcolor = white[
+      set pcolor 63
+    ]
+      if pcolor = black[
+      set pcolor 63
+    ]]
+    if current-season = "Verão" [
+      if pcolor = 63[
+      set pcolor 43
+    ]]
+    if current-season = "Outono" [ ; como a cor dai é predominante laranja, tive que modificar a cor base pra n dar problema na hora de aparecer as coisas.
+      if pcolor = 43[
+      set pcolor 23
+    ]]
+    if current-season = "Inverno" [
+      if pcolor = 23[
+      set pcolor white
+
+    ]]
+  ]
+end
+to update-trees
+  if current-season = "Primavera" [
+  ask turtles with [shape = "tree"] [
+      set color pink
+      ]
+
+      ask turtles with [shape = "tree"] [
+    ; Para cada árvore, define patches ao redor como fontes de alimento
+    let nearby-patches patches in-radius 9 ; Ajuste o raio conforme necessário
+    ask nearby-patches [
+      if random 100 < chancedomida [ ; 50% de chance de gerar comida em cada patch ao redor
+        set food one-of [1 2] ; Define quantidade de comida aleatória (1 ou 2)
+        set food-source-number [who] of myself ; Identifica a árvore como fonte de alimento
+        if food = 1 [ set pcolor red ] ; Comida 1 -> vermelho
+        if food = 2 [ set pcolor orange ]   ; Comida 2 -> laranja
+        if food = 1[ set food-source-number 1]
+        if food = 2[ set food-source-number 2]
+      ]
+    ]
+  ]
+  ]
+  if current-season = "Verão" [
+    ask turtles with [shape = "tree"] [
+      set color 47
+      ]
+
+      ask turtles with [shape = "tree"] [
+    ; Para cada árvore, define patches ao redor como fontes de alimento
+    let nearby-patches patches in-radius 9 ; Ajuste o raio conforme necessário
+    ask nearby-patches [
+      if random 100 < chancedomida [ ; 50% de chance de gerar comida em cada patch ao redor
+        set food one-of [1 2] ; Define quantidade de comida aleatória (1 ou 2)
+        set food-source-number [who] of myself ; Identifica a árvore como fonte de alimento
+        if food = 1 [ set pcolor red ] ; Comida 1 -> vermelho
+        if food = 2 [ set pcolor orange ]   ; Comida 2 -> laranja
+        if food = 1[ set food-source-number 1]
+        if food = 2[ set food-source-number 2]
+      ]
+    ]
+  ]
+  ]
+  if current-season = "Outono" [
+       ask turtles with [shape = "tree"] [
+      set color orange
+      ]
+
+      ask turtles with [shape = "tree"] [
+    ; Para cada árvore, define patches ao redor como fontes de alimento
+    let nearby-patches patches in-radius 9 ; Ajuste o raio conforme necessário
+    ask nearby-patches [
+      if random 100 < chancedomida [ ; 50% de chance de gerar comida em cada patch ao redor
+        set food one-of [1 2] ; Define quantidade de comida aleatória (1 ou 2)
+        set food-source-number [who] of myself ; Identifica a árvore como fonte de alimento
+        if food = 1 [ set pcolor red ] ; Comida 1 -> vermelho
+        if food = 2 [ set pcolor orange ]   ; Comida 2 -> laranja
+        if food = 1[ set food-source-number 1]
+        if food = 2[ set food-source-number 2]
+      ]
+    ]
+  ]
+  ]
+  if current-season = "Inverno" [
+       ask turtles with [shape = "tree"] [
+      set color 8
+      ]
+
+  ] ; Com isso, qualquer ninho que n tiver comida guardada está ferrado! Sem Setup food e sem comidas aleatórias.
+end
+
 
 ; === INFORMAÇÕES ADICIONAIS ===
 
@@ -852,7 +1037,7 @@ diffusion-rate
 diffusion-rate
 0.0
 99.0
-51.0
+50.0
 1.0
 1
 NIL
@@ -867,7 +1052,7 @@ evaporation-rate
 evaporation-rate
 0.0
 99.0
-10.0
+57.0
 1.0
 1
 NIL
@@ -899,7 +1084,7 @@ population
 population
 0.0
 200.0
-0.0
+25.0
 1.0
 1
 NIL
@@ -965,22 +1150,63 @@ Popsold
 Popsold
 0
 200
-14.0
+11.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-267
-268
-439
-301
+259
+250
+431
+283
 nascimentoformiga
 nascimentoformiga
 0
+100
+13.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+259
+290
+431
+323
+Preçoconstrução
+Preçoconstrução
+0
 200
-17.0
+51.0
+1
+1
+NIL
+HORIZONTAL
+
+INPUTBOX
+257
+328
+430
+388
+tamanhoseason
+600.0
+1
+0
+Number
+
+SLIDER
+260
+410
+432
+443
+chancedomida
+chancedomida
+0
+100
+13.0
 1
 1
 NIL
