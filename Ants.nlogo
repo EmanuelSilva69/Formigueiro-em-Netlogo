@@ -463,7 +463,7 @@ to nascimento
  if colony = violet[
     ask queen-ants[
     if ticks mod 100 = 0 [  ;; Fazer nascer as formigas a cada 100 ticks. MUDAR DEPOIS PARA MUDANÇA CLIMATICA
-      let num-new-ants random 9 + 1  ;; fazer nascer de 1 a 9 (bom aumentar?)
+      let num-new-ants nascimentoformiga + random 10  ;; slide do nascimento de formiga + incremento de 0 a 10  aleatório ->
      hatch-worker-ants num-new-ants [
       setxy -16 -36  ;; Spawnar perto da rainha violeta
       set shape "bug"
@@ -471,6 +471,7 @@ to nascimento
       set energy 10
       set size 1
       set colony violet
+     ; mover-formiga ;; Spawnar perto da rainha violeta
       aplicar-atributos
       ]]
     ]
@@ -478,14 +479,15 @@ to nascimento
  if colony = blue[
     ask queen-ants[
     if ticks mod 100 = 0 [  ;; Breed every 10 ticks
-      let num-new-ants random 9 + 1  ;; fazer nascer de 1 a 9
+      let num-new-ants nascimentoformiga + random 10  ;; slide do nascimento de formiga + incremento de 0 a 10
      hatch-worker-ants num-new-ants [
-      setxy 40 -32  ;; Spawnar perto da rainha azul
+       setxy 40 -32  ;; Spawnar perto da rainha azul (
       set shape "bug"
       set color blue
       set energy 10
       set size 1
       set colony blue
+    ;  mover-formiga ;; Spawnar perto da rainha azul -> trava em todo spawn por meio segundo, fica ruim logo n vou utilizar, já que o spawn especifico é mais leve no programa.
       aplicar-atributos
       ]]
     ]
@@ -493,14 +495,15 @@ to nascimento
   if colony = 126[
     ask queen-ants[
     if ticks mod 100 = 0 [  ;; Breed every 10 ticks
-      let num-new-ants random 9 + 1  ;; fazer nascer de 1 a 9
+      let num-new-ants nascimentoformiga + random 10  ;; slide do nascimento de formiga + incremento de 0 a 10
      hatch-worker-ants num-new-ants [
-      setxy -30 36  ;; Spawnar perto da rainha magenta
+       setxy -30 36  ;; Spawnar perto da rainha magenta
       set shape "bug"
       set color 126
       set energy 10
       set size 1
-      set colony 126
+          set colony 126
+        ;mover-formiga ;; Spawnar perto da rainha magenta
       aplicar-atributos
       ]]
     ]
@@ -508,9 +511,9 @@ to nascimento
   if colony = yellow[
     ask queen-ants[
     if ticks mod 100 = 0 [  ;; Breed every 10 ticks
-      let num-new-ants random 9 + 1  ;; fazer nascer de 1 a 9
+      let num-new-ants nascimentoformiga + random 10  ;; slide do nascimento de formiga + incremento de 0 a 10
      hatch-worker-ants num-new-ants [
-      setxy 26 47  ;; Spawnar perto da rainha amarela
+           setxy 26 47  ;; Spawnar perto da rainha amarela
       set shape "bug"
       set color yellow
       set energy 10
@@ -963,6 +966,21 @@ Popsold
 0
 200
 14.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+267
+268
+439
+301
+nascimentoformiga
+nascimentoformiga
+0
+200
+17.0
 1
 1
 NIL
