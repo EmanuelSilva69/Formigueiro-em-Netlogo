@@ -24,6 +24,10 @@ patches-own [
   nest-scent3           ; valor numérico maior próximo ao ninho, usado para orientar as formigas 3
   nest-scent4           ; valor numérico maior próximo ao ninho, usado para orientar as formigas 4
   food-source-number   ; identifica as fontes de alimento (1, 2 ou 3)
+  food-store ; guardar comida no ninho
+  food-store2 ; guardar comida no ninho
+  food-store3 ; guardar comida no ninho
+  food-store4 ; guardar comida no ninho
 ]
 ; Forma da Formiga ter energia e morrer, além dos atributos que eu criei
 worker-ants-own [energy colony life strenght mutation speed  vitima]
@@ -49,7 +53,7 @@ to setup
     set colony colony-color ; atribui a colônia
     aplicar-atributos
   ]
-    create-soldier-ants 10 [
+    create-soldier-ants popsold [ ;população de soldados
     set vitima false
     set size 2                          ; aumenta o tamanho para melhor visualização
     set color colony-color + 3                      ; formiga soldado é magenta (tirei a cor do site lá) um pouco diferente do trabalhador
@@ -165,9 +169,12 @@ to aplicar-atributos ;[violet blue 126 yellow] [energy life strenght speed] bote
     set mutation "no"
   ]
 end
-
-to setup-nest  ; procedimento dos patches  ;Código abaixo para criar nests como patches, e não turtles.
+to setup-nest  ;; patch procedure
     set nest? false
+    set food-store 0
+  set food-store2 0 ;começa com 0 comidas guardadas
+  set food-store3 0
+  set food-store4 0
     set nest2? false
     set nest3? false ;Sem isso daqui dá um erro tenebroso n sei pq
     set nest4? false
@@ -310,7 +317,13 @@ to go
      set energy energy - 1
     ]
   ]
-  ask queen-ants []
+  ask queen-ants [
+   nascimento
+    ]
+
+
+
+
  diffuse chemical (diffusion-rate / 100) ;difusão dos feromonios
   diffuse chemical2 (diffusion-rate / 100)
   diffuse chemical3 (diffusion-rate / 100)
@@ -373,7 +386,7 @@ end
 to return-to-nest
     ifelse nest? [
       set color violet                  ; Deposita comida e volta à cor original
-
+    set food-store food-store + 1
       rt 180
     ] [
       set chemical chemical + 60        ; Libera feromônio no caminho
@@ -384,7 +397,7 @@ end
 to return-to-nest2
     ifelse nest2? [
       set color blue                    ; Deposita comida e volta à cor original
-
+    set food-store2 food-store2 + 1
       rt 180
     ] [
       set chemical2 chemical2 + 60      ; Libera feromônio no caminho
@@ -395,7 +408,7 @@ end
 to return-to-nest3
     ifelse nest3? [
       set color 126                     ; Deposita comida e volta à cor original
-                ; Indica que não está mais carregando comida
+      set food-store3 food-store3 + 1
       rt 180
     ] [
       set chemical3 chemical3 + 60      ; Libera feromônio no caminho
@@ -407,7 +420,7 @@ to return-to-nest4
 
     ifelse nest4? [
       set color yellow                  ; Deposita comida e volta à cor original
-
+      set food-store4 food-store4 + 1
       rt 180
     ] [
       set chemical4 chemical4 + 60      ; Libera feromônio no caminho
@@ -442,6 +455,71 @@ end
 to attack ;começar a fazer o Combate das formigas
 
 
+end
+to kill-nestvazia ;acabar com as nests vazias.
+
+end
+to nascimento
+ if colony = violet[
+    ask queen-ants[
+    if ticks mod 100 = 0 [  ;; Fazer nascer as formigas a cada 100 ticks. MUDAR DEPOIS PARA MUDANÇA CLIMATICA
+      let num-new-ants random 9 + 1  ;; fazer nascer de 1 a 9 (bom aumentar?)
+     hatch-worker-ants num-new-ants [
+      setxy -16 -36  ;; Spawnar perto da rainha violeta
+      set shape "bug"
+      set color violet
+      set energy 10
+      set size 1
+      set colony violet
+      aplicar-atributos
+      ]]
+    ]
+  ]
+ if colony = blue[
+    ask queen-ants[
+    if ticks mod 100 = 0 [  ;; Breed every 10 ticks
+      let num-new-ants random 9 + 1  ;; fazer nascer de 1 a 9
+     hatch-worker-ants num-new-ants [
+      setxy 40 -32  ;; Spawnar perto da rainha azul
+      set shape "bug"
+      set color blue
+      set energy 10
+      set size 1
+      set colony blue
+      aplicar-atributos
+      ]]
+    ]
+  ]
+  if colony = 126[
+    ask queen-ants[
+    if ticks mod 100 = 0 [  ;; Breed every 10 ticks
+      let num-new-ants random 9 + 1  ;; fazer nascer de 1 a 9
+     hatch-worker-ants num-new-ants [
+      setxy -30 36  ;; Spawnar perto da rainha magenta
+      set shape "bug"
+      set color 126
+      set energy 10
+      set size 1
+      set colony 126
+      aplicar-atributos
+      ]]
+    ]
+  ]
+  if colony = yellow[
+    ask queen-ants[
+    if ticks mod 100 = 0 [  ;; Breed every 10 ticks
+      let num-new-ants random 9 + 1  ;; fazer nascer de 1 a 9
+     hatch-worker-ants num-new-ants [
+      setxy 26 47  ;; Spawnar perto da rainha amarela
+      set shape "bug"
+      set color yellow
+      set energy 10
+      set size 1
+      set colony yellow
+      aplicar-atributos
+      ]]
+    ]
+  ]
 end
 ; === MOVIMENTAÇÃO E ORIENTAÇÃO === ME perdoe por esse crime que vocês vão ver
 
@@ -771,7 +849,7 @@ diffusion-rate
 diffusion-rate
 0.0
 99.0
-50.0
+51.0
 1.0
 1
 NIL
@@ -810,15 +888,15 @@ NIL
 0
 
 SLIDER
+31
 36
-23
-226
-56
+221
+69
 population
 population
 0.0
 200.0
-29.0
+0.0
 1.0
 1
 NIL
@@ -853,6 +931,42 @@ count turtles
 17
 1
 11
+
+PLOT
+233
+33
+433
+183
+Food in each nest
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"Ninho 1" 1.0 0 -8630108 true "" "let total-food sum [food-store] of patches plot total-food"
+"Ninho 2" 1.0 0 -13345367 true "" "let total-food sum [food-store2] of patches plot total-food"
+"Ninho 3" 1.0 0 -4699768 true "" "let total-food sum [food-store3] of patches plot total-food"
+"Ninho 4" 1.0 0 -1184463 true "" "let total-food sum [food-store4] of patches plot total-food"
+
+SLIDER
+260
+215
+432
+248
+Popsold
+Popsold
+0
+200
+14.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
