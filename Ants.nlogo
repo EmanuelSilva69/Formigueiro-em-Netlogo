@@ -8,6 +8,7 @@ breed [trees tree] ; Arvore
 breed [nests nest]  ; Ninho pras formigas
 breed [tamanduas tamandua] ; predador tamandua
 breed [pangolims pangolim] ; predador pangolim todo fofinho
+breed [lucas luca]; easter egg
 ; Variáveis dos patches (espaço onde as formigas se movem)
 patches-own [
   chemical             ; quantidade de feromônio neste patch
@@ -34,6 +35,8 @@ worker-ants-own [energy colony life strenght mutation speed  vitima]
 soldier-ants-own [energy colony life strenght mutation speed role vitima]
 queen-ants-own [energy colony life strenght mutation speed vitima]
 trees-own [energy]
+pangolims-own [energy colony life strenght speed]
+tamanduas-own [energy colony life strenght speed]
 ; === PROCEDIMENTOS DE CONFIGURAÇÃO ===
 to setup
   clear-all                            ; limpa o mundo e reinicia a simulação
@@ -113,7 +116,7 @@ to aplicar-atributos ;[violet blue 126 yellow] [energy life strenght speed] bote
     set energy  1000
     set life  15
     set strenght  3
-    set speed 2
+    set speed 1
     if breed = soldier-ants[
     set life  45
     set strenght  5
@@ -126,7 +129,7 @@ to aplicar-atributos ;[violet blue 126 yellow] [energy life strenght speed] bote
     set energy  1300
     set life  7
     set strenght  1
-    set speed 3
+    set speed 1.5
     if breed = soldier-ants[
     set life  16
     set strenght  3
@@ -139,7 +142,7 @@ to aplicar-atributos ;[violet blue 126 yellow] [energy life strenght speed] bote
     set energy  800
     set life  30
     set strenght  5
-    set speed 1
+    set speed 0.5
     if breed = soldier-ants[
     set life  62
     set strenght  8
@@ -152,6 +155,7 @@ to aplicar-atributos ;[violet blue 126 yellow] [energy life strenght speed] bote
     set energy  925
     set life  17
     set strenght  4
+    set speed 0.75
     if breed = soldier-ants[
     set life  52
     set strenght  7.5
@@ -291,7 +295,7 @@ to go
         [look-for-food4 ] [ return-to-nest4 ]]
 
     wiggle                               ; movimento aleatório para simular procura
-    fd 1                                 ; move-se para frente
+    fd speed                                 ; move-se para frente
     set energy energy - 2                ; Diminui a energia delas
   ]
   ask soldier-ants [
@@ -373,11 +377,23 @@ to go
     set chemical4 chemical4 * (100 - evaporation-rate) / 100
     recolor-patch ; atualiza as cores após mudança
   ]
+
+  ask tamanduas[
+    wiggle
+    fd speed
+  ]
+  ask pangolims[
+        wiggle
+    fd speed
+  ]
   check-death
   handle-season-change
+  kill-nestvazia
   tick                                  ; avança o contador de tempo da simulação
 
 end
+
+
 
 ; === COMPORTAMENTOS DAS FORMIGAS ===
 
@@ -479,6 +495,10 @@ to check-death ;ver se a formiga vai morrer
   ask queen-ants [
     if energy <= 0 [ die ]
   ]
+  ask tamanduas[
+   if energy <= 0 [ die ]]
+   ask pangolims[
+   if energy <= 0 [ die ]]
 end
 to patrulha-ou-luta
   ifelse any? other turtles with [ (breed != trees) and ;;pra impedir as formigas de atacarem as arvores
@@ -496,6 +516,57 @@ to attack ;começar a fazer o Combate das formigas
 
 end
 to kill-nestvazia ;acabar com as nests vazias.
+   ;; Verifica os ninhos e suas respectivas rainhas
+  ask patches with [nest? or nest2? or nest3? or nest4?] [
+    if nest? [
+      if not any? turtles with [breed = queen-ants and colony = violet] [
+        ;; Remove o ninho se não houver rainha correspondente
+        set nest? false
+        set nest-scent 0
+        set food-store 0
+      if current-season = "Primavera" [ set pcolor 63 ]
+      if current-season = "Verão" [ set pcolor 43 ]
+      if current-season = "Outono" [ set pcolor 23 ]
+      if current-season = "Inverno" [ set pcolor white ]
+      ]
+    ]
+    if nest2? [
+      if not any? turtles with [breed = queen-ants and colony = blue] [
+        ;; Remove o ninho se não houver rainha correspondente
+        set nest2? false
+        set nest-scent2 0
+        set food-store2 0
+         if current-season = "Primavera" [ set pcolor 63 ]
+      if current-season = "Verão" [ set pcolor 43 ]
+      if current-season = "Outono" [ set pcolor 23 ]
+      if current-season = "Inverno" [ set pcolor white ]
+      ]
+    ]
+    if nest3? [
+      if not any? turtles with [breed = queen-ants and colony = 126] [
+        ;; Remove o ninho se não houver rainha correspondente
+        set nest3? false
+        set nest-scent3 0
+        set food-store3 0
+         if current-season = "Primavera" [ set pcolor 63 ]
+      if current-season = "Verão" [ set pcolor 43 ]
+      if current-season = "Outono" [ set pcolor 23 ]
+      if current-season = "Inverno" [ set pcolor white ]
+      ]
+    ]
+    if nest4? [
+      if not any? turtles with [breed = queen-ants and colony = yellow] [
+        ;; Remove o ninho se não houver rainha correspondente
+        set nest4? false
+        set nest-scent4 0
+        set food-store4 0
+         if current-season = "Primavera" [ set pcolor 63 ]
+      if current-season = "Verão" [ set pcolor 43 ]
+      if current-season = "Outono" [ set pcolor 23 ]
+      if current-season = "Inverno" [ set pcolor white ]
+      ]
+    ]
+  ]
 
 end
 to nascimento
@@ -586,7 +657,7 @@ to nascimento
       aplicar-atributos
   ]
        hatch-soldier-ants random 5 [
-      setxy 28 45  ;; Spawnar perto da rainha violeta
+      setxy 30 40  ;; Spawnar perto da rainha violeta
       set shape "bug"
       set color yellow + 3
       set energy 1000
@@ -729,16 +800,16 @@ to movimento-soldado
 
   ;; Move in a circular pattern by adjusting the heading randomly and moving forward
   set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  fd 0.5 ;; Move forward
+  fd speed ;; Move forward
 
   ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
   ifelse distancexy nest-x nest-y < 3 [
     rt random 90  ;; Turn randomly to avoid staying at the same spot
-    fd 0.5        ;; Move forward
+    fd speed        ;; Move forward
   ][
     ;; Continue patrolling around the defined spot
     rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    fd 0.5    ;; Move forward
+    fd speed    ;; Move forward
   ]]
 
 
@@ -755,16 +826,16 @@ to movimento-soldado2
 
   ;; Move in a circular pattern by adjusting the heading randomly and moving forward
   set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  fd 0.5  ;; Move forward
+  fd speed  ;; Move forward
 
   ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
   ifelse distancexy nest-x nest-y < 3 [
     rt random 90  ;; Turn randomly to avoid staying at the same spot
-    fd 0.5         ;; Move forward
+    fd speed         ;; Move forward
   ][
     ;; Continue patrolling around the defined spot
     rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    fd 0.5    ;; Move forward
+    fd speed    ;; Move forward
   ]]
 end
 to movimento-soldado3
@@ -779,16 +850,16 @@ to movimento-soldado3
 
   ;; Move in a circular pattern by adjusting the heading randomly and moving forward
   set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  fd 0.5  ;; Move forward
+  fd speed  ;; Move forward
 
   ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
   ifelse distancexy nest-x nest-y < 3 [
     rt random 90  ;; Turn randomly to avoid staying at the same spot
-    fd 0.5         ;; Move forward
+    fd speed         ;; Move forward
   ][
     ;; Continue patrolling around the defined spot
     rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    fd 0.5    ;; Move forward
+    fd speed    ;; Move forward
   ]]
 end
 to movimento-soldado4
@@ -803,16 +874,16 @@ to movimento-soldado4
 
   ;; Move in a circular pattern by adjusting the heading randomly and moving forward
   set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  fd 0.5  ;; Move forward
+  fd speed  ;; Move forward
 
   ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
   ifelse distancexy nest-x nest-y < 3 [
     rt random 90  ;; Turn randomly to avoid staying at the same spot
-    fd 1         ;; Move forward
+    fd speed        ;; Move forward
   ][
     ;; Continue patrolling around the defined spot
     rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    fd 0.5    ;; Move forward
+    fd speed   ;; Move forward
   ]]
   if role = "fighting"[
 
@@ -904,6 +975,18 @@ to update-patches-for-season
   ]
 end
 to update-trees
+    if random 100 < 3[ ;%3 de spawnar
+    create-lucas 1[;; easter egg
+      setxy 0 0
+      set size 4
+    set color 136
+      set shape "person"
+      set label "Lucas o intruso do formigueiro"
+    ]
+  ]
+  repeat num-predador[
+  if random 100 < chancepredador[
+      gerar-predador]]
   if current-season = "Primavera" [
   ask turtles with [shape = "tree"] [
       set color pink
@@ -972,7 +1055,34 @@ to update-trees
   ] ; Com isso, qualquer ninho que n tiver comida guardada está ferrado! Sem Setup food e sem comidas aleatórias.
 end
 
+;=== Preadores=====
+to gerar-predador ;pangolims-own [energy colony life strenght speed]
 
+  ifelse random 100 < 50[ ; 50% de gerar um ou outro
+  create-tamanduas random 3[
+      set shape "tamandua"
+      set color brown
+      set size 17
+      setxy random 40 random 40
+      set energy 10000
+      set colony "enemies"
+      set life 1600
+      set strenght 87
+      set speed 1
+  ]]
+  [create-pangolims random 5 + 1 [
+      set shape "pangolim"
+      set color 37
+      set size 12
+      setxy random 40 random 40
+      set energy 10000
+      set colony "enemies"
+      set life 700
+      set strenght 48
+      set speed 1.7
+
+  ]]
+end
 ; === INFORMAÇÕES ADICIONAIS ===
 
 ; Este modelo simula o comportamento de formigas em busca de alimento e retorno ao ninho.
@@ -1037,7 +1147,7 @@ diffusion-rate
 diffusion-rate
 0.0
 99.0
-50.0
+49.0
 1.0
 1
 NIL
@@ -1192,7 +1302,7 @@ INPUTBOX
 430
 388
 tamanhoseason
-600.0
+100.0
 1
 0
 Number
@@ -1207,6 +1317,36 @@ chancedomida
 0
 100
 13.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+242
+495
+414
+528
+num-predador
+num-predador
+0
+100
+5.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+67
+493
+239
+526
+chancepredador
+chancepredador
+0
+100
+10.0
 1
 1
 NIL
@@ -1449,6 +1589,173 @@ true
 0
 Line -7500403 true 150 0 150 150
 
+pangolim
+false
+0
+Polygon -7500403 true true 86 145 100 171 98 194 110 213 98 239 82 249 93 262 106 264 113 254 139 208 158 209 188 209 218 239 217 250 210 255 204 262 207 270 218 271 241 273 248 254 247 209 262 194 277 164 263 134 233 104 173 89 98 104
+Polygon -7500403 true true 123 149 122 101 92 100 69 95 44 105 12 160 17 165 54 147 81 137
+Polygon -2064490 true false 53 130 61 143 19 168 12 156 25 141
+Circle -16777216 true false 40 133 8
+Polygon -16777216 true false 53 122 62 135 61 127 57 118 54 119 53 124
+Polygon -7500403 true true 248 166 245 122 295 159 293 225 287 280 268 301 237 301 194 301 153 294 148 273 170 266 181 271 194 279 213 281 238 280 246 268 258 252 254 243 268 209 271 194 278 181 256 163 208 118
+Polygon -16777216 false false 180 89 180 102 189 106 194 96
+Polygon -16777216 false false 85 102 85 115 92 116 102 113
+Polygon -16777216 false false 98 113 98 126 107 130 112 120
+Polygon -16777216 false false 140 152 140 165 149 169 154 159
+Polygon -16777216 false false 125 158 125 171 135 180 139 165
+Polygon -16777216 false false 87 138 90 150 96 155 101 145
+Polygon -16777216 false false 96 151 96 164 105 168 110 158
+Polygon -16777216 false false 109 152 109 165 118 169 123 159
+Polygon -16777216 false false 136 101 136 114 145 118 150 108
+Polygon -16777216 false false 141 114 141 127 150 131 155 121
+Polygon -16777216 false false 131 122 131 135 140 139 145 129
+Polygon -16777216 false false 126 133 126 146 135 150 140 140
+Polygon -16777216 false false 122 96 122 109 131 113 136 103
+Polygon -16777216 false false 113 137 113 150 122 154 127 144
+Polygon -16777216 false false 111 119 111 132 120 136 125 126
+Polygon -16777216 false false 117 108 117 121 126 125 131 115
+Polygon -16777216 false false 105 100 105 113 114 117 119 107
+Polygon -16777216 false false 99 130 99 143 108 147 113 137
+Polygon -16777216 false false 178 141 178 154 187 158 192 148
+Polygon -16777216 false false 170 126 170 139 179 143 184 133
+Polygon -16777216 false false 150 144 150 157 159 161 164 151
+Polygon -16777216 false false 111 220 111 233 120 237 125 227
+Polygon -16777216 false false 100 215 100 228 109 232 114 222
+Polygon -16777216 false false 117 206 117 219 126 223 131 213
+Polygon -16777216 false false 110 193 110 206 119 210 124 200
+Polygon -16777216 false false 144 180 144 193 153 197 158 187
+Polygon -16777216 false false 133 180 133 193 142 197 147 187
+Polygon -16777216 false false 124 190 124 203 133 207 138 197
+Polygon -16777216 false false 125 147 125 160 134 164 139 153
+Polygon -16777216 false false 110 182 110 195 119 199 124 189
+Polygon -16777216 false false 107 169 107 182 116 186 121 176
+Polygon -16777216 false false 140 90 140 103 149 107 154 97
+Polygon -16777216 false false 151 89 151 102 160 106 165 96
+Polygon -16777216 false false 162 90 162 103 171 107 176 97
+Polygon -16777216 false false 164 108 164 121 173 125 178 115
+Polygon -16777216 false false 151 102 151 115 160 119 165 109
+Polygon -16777216 false false 155 119 155 132 164 136 169 126
+Polygon -16777216 false false 163 165 163 178 172 182 177 172
+Polygon -16777216 false false 138 166 138 179 147 183 152 173
+Polygon -16777216 false false 150 166 150 179 159 183 164 173
+Polygon -16777216 false false 165 150 165 163 174 167 179 157
+Polygon -16777216 false false 163 136 163 149 172 153 177 143
+Polygon -16777216 false false 145 130 145 143 154 147 159 137
+Polygon -16777216 false false 138 139 138 152 147 156 152 146
+Polygon -16777216 false false 220 115 220 128 227 129 237 126
+Polygon -16777216 false false 211 103 211 116 218 117 228 114
+Polygon -16777216 false false 217 158 217 171 224 172 234 169
+Polygon -16777216 false false 210 149 210 162 217 163 220 159
+Polygon -16777216 false false 214 168 214 181 221 182 231 179
+Polygon -16777216 false false 234 164 234 177 241 178 251 175
+Polygon -16777216 false false 228 174 228 187 235 188 245 185
+Polygon -16777216 false false 222 183 222 196 229 197 239 194
+Polygon -16777216 false false 83 115 83 128 90 129 100 126
+Polygon -16777216 false false 98 142 98 129 91 128 81 131
+Polygon -16777216 false false 202 139 202 152 209 153 219 150
+Polygon -16777216 false false 207 115 207 128 214 129 224 126
+Polygon -16777216 false false 211 190 211 203 218 204 228 201
+Polygon -16777216 false false 200 197 200 210 207 211 217 208
+Polygon -16777216 false false 195 98 195 111 202 112 212 109
+Polygon -16777216 false false 194 182 194 195 201 196 211 193
+Polygon -16777216 false false 179 184 179 197 186 198 196 195
+Polygon -16777216 false false 192 170 192 183 199 184 209 181
+Polygon -16777216 false false 195 160 195 173 202 174 212 171
+Polygon -16777216 false false 193 145 193 158 200 159 210 156
+Polygon -16777216 false false 197 124 197 137 204 138 214 135
+Polygon -16777216 false false 191 106 191 119 198 120 208 117
+Polygon -16777216 false false 158 194 153 203 160 204 170 201
+Polygon -16777216 false false 161 186 163 196 168 200 178 197
+Polygon -16777216 false false 162 175 162 188 169 189 179 186
+Polygon -16777216 false false 175 173 175 186 182 187 192 184
+Polygon -16777216 false false 180 160 180 173 187 174 197 171
+Polygon -16777216 false false 187 129 187 142 194 143 204 140
+Polygon -16777216 false false 179 114 179 127 186 128 196 125
+Polygon -16777216 false false 175 99 175 112 182 113 192 110
+Polygon -16777216 false false 263 142 263 155 270 156 280 153
+Polygon -16777216 false false 249 128 249 141 256 142 266 139
+Polygon -16777216 false false 257 161 257 174 264 175 274 172
+Polygon -16777216 false false 235 117 235 130 242 131 252 128
+Polygon -16777216 false false 257 150 257 163 264 164 274 161
+Polygon -16777216 false false 247 180 247 193 254 194 264 191
+Polygon -16777216 false false 232 212 232 225 239 226 249 223
+Polygon -16777216 false false 223 220 223 233 230 234 240 231
+Polygon -16777216 false false 230 230 230 243 237 244 247 241
+Polygon -16777216 false false 204 210 204 223 211 224 221 221
+Polygon -16777216 false false 221 198 221 211 228 212 238 209
+Polygon -16777216 false false 230 192 230 205 237 206 247 203
+Polygon -16777216 false false 244 137 244 150 251 151 261 148
+Polygon -16777216 false false 218 124 218 137 225 138 235 135
+Polygon -16777216 false false 231 129 231 142 238 143 248 140
+Polygon -16777216 false false 234 147 234 160 241 161 251 158
+Polygon -16777216 false false 216 289 216 302 225 306 230 296
+Polygon -16777216 false false 219 277 219 290 228 294 233 284
+Polygon -16777216 false false 203 289 203 302 212 306 217 296
+Polygon -16777216 false false 209 279 209 292 218 296 223 286
+Polygon -16777216 false false 117 108 117 121 126 125 131 115
+Polygon -16777216 false false 195 277 195 290 204 294 209 284
+Polygon -16777216 false false 189 286 189 299 198 303 203 293
+Polygon -16777216 false false 183 272 183 285 192 289 197 279
+Polygon -16777216 false false 176 282 176 295 185 299 190 289
+Polygon -16777216 false false 155 279 155 292 164 296 169 286
+Polygon -16777216 false false 163 276 163 289 172 293 177 283
+Polygon -16777216 false false 172 268 172 281 181 285 186 275
+Polygon -16777216 false false 159 265 159 278 168 282 173 272
+Polygon -16777216 false false 148 268 148 281 157 285 162 275
+Polygon -16777216 false false 253 289 253 302 262 306 267 296
+Polygon -16777216 false false 259 282 259 295 268 299 273 289
+Polygon -16777216 false false 267 274 267 287 276 291 281 281
+Polygon -16777216 false false 273 248 273 261 282 265 287 255
+Polygon -16777216 false false 274 233 274 246 283 250 288 240
+Polygon -16777216 false false 277 222 277 235 286 239 291 229
+Polygon -16777216 false false 281 209 281 222 290 226 295 216
+Polygon -16777216 false false 282 197 282 210 291 214 296 204
+Polygon -16777216 false false 284 180 284 193 293 197 298 187
+Polygon -16777216 false false 277 171 277 184 286 188 291 178
+Polygon -16777216 false false 273 182 273 195 282 199 287 189
+Polygon -16777216 false false 269 194 269 207 278 211 283 201
+Polygon -16777216 false false 267 209 267 222 276 226 281 216
+Polygon -16777216 false false 262 220 262 233 271 237 276 227
+Polygon -16777216 false false 257 229 257 242 266 246 271 236
+Polygon -16777216 false false 255 241 255 254 264 258 269 248
+Polygon -16777216 false false 253 255 253 268 262 272 267 262
+Polygon -16777216 false false 254 268 254 281 263 285 268 275
+Polygon -16777216 false false 246 277 246 290 255 294 260 284
+Polygon -16777216 false false 244 262 244 275 253 279 258 269
+Polygon -16777216 false false 240 287 240 300 249 304 254 294
+Polygon -16777216 false false 240 273 237 283 246 287 251 277
+Polygon -16777216 false false 230 292 230 305 239 309 244 299
+Polygon -16777216 false false 230 280 230 293 239 297 244 287
+Polygon -16777216 false false 275 150 275 163 284 167 289 157
+Polygon -16777216 false false 271 156 271 169 280 173 285 163
+Polygon -16777216 false false 122 173 122 186 131 190 136 180
+Polygon -16777216 false false 98 142 98 129 91 128 81 131
+Polygon -16777216 false false 98 142 98 129 91 128 81 131
+Polygon -16777216 false false 270 272 277 267 270 266 260 269
+Polygon -16777216 false false 286 285 286 272 279 271 269 274
+Polygon -16777216 false false 273 248 273 261 282 265 287 255
+Polygon -16777216 false false 274 257 274 270 283 274 288 264
+Polygon -16777216 false false 284 160 284 173 293 177 298 167
+Polygon -16777216 false false 267 237 267 250 276 254 281 244
+Polygon -16777216 false false 265 251 265 264 274 268 279 258
+Polygon -16777216 false false 105 100 105 113 114 117 119 107
+Polygon -16777216 false false 31 128 26 137 34 137 40 131
+Polygon -16777216 false false 34 118 34 131 43 131 48 125
+Polygon -16777216 false false 43 107 43 120 52 124 57 114
+Polygon -16777216 false false 52 100 52 113 61 117 66 107
+Polygon -16777216 false false 61 123 61 136 70 140 75 130
+Polygon -16777216 false false 92 97 92 110 101 114 106 104
+Polygon -16777216 false false 63 111 63 124 72 128 77 118
+Polygon -16777216 false false 61 96 61 109 70 113 75 103
+Polygon -16777216 false false 72 121 72 134 81 138 86 128
+Polygon -16777216 false false 74 108 74 121 83 125 88 115
+Polygon -16777216 false false 72 93 72 106 81 110 86 100
+Polygon -16777216 true false 90 252 117 266 111 264 94 264 82 251 87 250
+Polygon -16777216 true false 204 262 220 269 240 271 239 274 204 271 203 260
+Polygon -16777216 false false 217 136 217 149 224 150 234 147
+Polygon -16777216 false false 245 162 240 165 254 179 259 168
+Polygon -16777216 false false 214 227 214 240 223 244 228 234
+
 pentagon
 false
 0
@@ -1462,6 +1769,26 @@ Polygon -7500403 true true 105 90 120 195 90 285 105 300 135 300 150 225 165 300
 Rectangle -7500403 true true 127 79 172 94
 Polygon -7500403 true true 195 90 240 150 225 180 165 105
 Polygon -7500403 true true 105 90 60 150 75 180 135 105
+
+person soldier
+false
+0
+Rectangle -7500403 true true 127 79 172 94
+Polygon -10899396 true false 105 90 60 195 90 210 135 105
+Polygon -10899396 true false 195 90 240 195 210 210 165 105
+Circle -7500403 true true 110 5 80
+Polygon -10899396 true false 105 90 120 195 90 285 105 300 135 300 150 225 165 300 195 300 210 285 180 195 195 90
+Polygon -6459832 true false 120 90 105 90 180 195 180 165
+Line -6459832 false 109 105 139 105
+Line -6459832 false 122 125 151 117
+Line -6459832 false 137 143 159 134
+Line -6459832 false 158 179 181 158
+Line -6459832 false 146 160 169 146
+Rectangle -6459832 true false 120 193 180 201
+Polygon -6459832 true false 122 4 107 16 102 39 105 53 148 34 192 27 189 17 172 2 145 0
+Polygon -16777216 true false 183 90 240 15 247 22 193 90
+Rectangle -6459832 true false 114 187 128 208
+Rectangle -6459832 true false 177 187 191 208
 
 plant
 false
@@ -1486,10 +1813,43 @@ false
 Rectangle -7500403 true true 30 30 270 270
 Rectangle -16777216 true false 60 60 240 240
 
+squirrel
+false
+0
+Polygon -7500403 true true 87 267 106 290 145 292 157 288 175 292 209 292 207 281 190 276 174 277 156 271 154 261 157 245 151 230 156 221 171 209 214 165 231 171 239 171 263 154 281 137 294 136 297 126 295 119 279 117 241 145 242 128 262 132 282 124 288 108 269 88 247 73 226 72 213 76 208 88 190 112 151 107 119 117 84 139 61 175 57 210 65 231 79 253 65 243 46 187 49 157 82 109 115 93 146 83 202 49 231 13 181 12 142 6 95 30 50 39 12 96 0 162 23 250 68 275
+Polygon -16777216 true false 237 85 249 84 255 92 246 95
+Line -16777216 false 221 82 213 93
+Line -16777216 false 253 119 266 124
+Line -16777216 false 278 110 278 116
+Line -16777216 false 149 229 135 211
+Line -16777216 false 134 211 115 207
+Line -16777216 false 117 207 106 211
+Line -16777216 false 91 268 131 290
+Line -16777216 false 220 82 213 79
+Line -16777216 false 286 126 294 128
+Line -16777216 false 193 284 206 285
+
 star
 false
 0
 Polygon -7500403 true true 151 1 185 108 298 108 207 175 242 282 151 216 59 282 94 175 3 108 116 108
+
+tamandua
+false
+0
+Polygon -7500403 true true 45 60 30 45 45 30 75 45 90 75
+Polygon -7500403 true true 255 60 270 45 255 30 225 45 210 75
+Circle -16777216 true false 183 138 24
+Circle -16777216 true false 93 138 24
+Polygon -7500403 true true 60 75 75 120 90 165 120 240 120 300 180 300 180 240 210 165 225 120 240 75 240 0 60 0
+Circle -16777216 true false 90 135 30
+Circle -16777216 true false 180 135 30
+Rectangle -7500403 true true 150 270 150 300
+Polygon -16777216 true false 60 60 105 30
+Polygon -2064490 true false 150 285 150 300 180 300 210 300 225 285 225 240 210 255 210 285 210 285 165 285 150 285
+Polygon -16777216 true false 240 45 240 45 255 45 240 60 240 45 240 45
+Rectangle -16777216 true false 135 285 165 300
+Polygon -16777216 true false 60 45 60 45 45 45 60 60 60 45 60 45
 
 target
 false
