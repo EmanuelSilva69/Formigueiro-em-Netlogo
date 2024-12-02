@@ -3,9 +3,9 @@ Ideias : - Emanuel
 2-	 Classes de formiga (criei os breeds, falta a luta dos soldados, o resto tá ok)
 3-	- atributos aleatórios (atributos fixos mas mutação aleatória) OK
 4-	- mudança de estações Realizado OK
-5-	- briga de formiga 
-6-	- predadores
-7-	- interação dos predadores(?)
+5-	- briga de formiga Ok
+6-	- predadores Ok
+7-	- interação dos predadores(?) - Fazendo
 8-	[Spawn aleatório das formigas com atributos pré-definidos(não é aleatório, mas tem os atributos) OK ( o spawn ocorre a cada troca de estação, caso tenha comida)
 9-	 raças diferentes de formigas com atributos diferentes Ok (não são aleatórios, botei uns números de 0 a 60 que eu pedi pro google sortear)
 10-	Criar arvores para a comida ficar ao redor!=ok
