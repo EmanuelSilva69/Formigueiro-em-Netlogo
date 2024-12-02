@@ -1033,7 +1033,7 @@ to update-patches-for-season
   ]
 end
 to update-trees
-    if random 100 < 10[ ;%3 de spawnar
+    if random 100 < 3[ ;%3 de spawnar
     create-lucas 1[;; easter egg
       setxy 0 0
       set size 4
