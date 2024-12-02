@@ -9,6 +9,7 @@ breed [nests nest]  ; Ninho pras formigas
 breed [tamanduas tamandua] ; predador tamandua
 breed [pangolims pangolim] ; predador pangolim todo fofinho
 breed [lucas luca]; easter egg
+breed [wolfs wolf] ; predador dos predadores
 ; Variáveis dos patches (espaço onde as formigas se movem)
 patches-own [
   chemical             ; quantidade de feromônio neste patch
@@ -40,7 +41,8 @@ queen-ants-own [energy colony life strenght mutation speed vitima]
 trees-own [energy]
 pangolims-own [energy colony life strenght speed]
 tamanduas-own [energy colony life strenght speed]
-lucas-own[life strenght speed]
+lucas-own [life strenght speed]
+wolfs-own [energy colony life strenght speed]
 
 ; === PROCEDIMENTOS DE CONFIGURAÇÃO ===
 to setup
@@ -387,6 +389,9 @@ to go
     set chemical3 chemical3 * (100 - evaporation-rate) / 100
     set chemical4 chemical4 * (100 - evaporation-rate) / 100
     recolor-patch ; atualiza as cores após mudança
+  ]
+  ask wolfs[ wiggle
+    fd speed
   ]
 
   ask tamanduas[
@@ -1116,7 +1121,7 @@ end
 to gerar-predador ;pangolims-own [energy colony life strenght speed]
 
   ifelse random 100 < 50[ ; 50% de gerar um ou outro
-  create-tamanduas random 3[
+  create-tamanduas random 2[
       set shape "tamandua"
       set color brown
       set size 17
@@ -1127,7 +1132,7 @@ to gerar-predador ;pangolims-own [energy colony life strenght speed]
       set strenght 87
       set speed 1
   ]]
-  [create-pangolims random 5 + 1 [
+  [create-pangolims random 4 [
       set shape "pangolim"
       set color 37
       set size 12
@@ -1139,10 +1144,24 @@ to gerar-predador ;pangolims-own [energy colony life strenght speed]
       set speed 1.7
 
   ]]
+  if predador-moron = true [
+  if random 100 < chancemor[
+   create-wolfs 1 + random 2 [
+      set shape "wolf"
+      set color 3
+      set size 16
+      setxy random 40 random 40
+      set energy 10000
+      set colony "enemies"
+      set life 900
+      set strenght 180
+      set speed 2.6
+  ]]]
 end
 
 to predar
   let predador turtles with [breed = tamanduas or breed = pangolims]
+  let predador-mor turtles with [breed = wolfs]
   ask predador [
     let presas-proximas turtles with [breed = worker-ants or breed = soldier-ants or breed = queen-ants and distance myself < 3]
 
@@ -1156,6 +1175,19 @@ to predar
       ]
     ]
   ]
+  if predador-moron = true [
+  ask predador-mor [
+  let presas-proximas turtles with [breed = tamanduas or breed = pangolims and distance myself < 3]
+    if any? presas-proximas [
+      let presa one-of presas-proximas
+      face presa  ;; Vira-se para o inimigo
+      fd 1                ;; Move-se 1 passo em direção ao inimigo
+      ask presa [
+        face self
+        set life life - [strenght] of myself
+      ]
+    ]
+  ]]
 end
 
 ;== Obstáculos ==
@@ -1260,7 +1292,7 @@ diffusion-rate
 diffusion-rate
 0.0
 99.0
-52.0
+53.0
 1.0
 1
 NIL
@@ -1465,6 +1497,28 @@ chancepredador
 NIL
 HORIZONTAL
 
+SWITCH
+226
+547
+372
+580
+Predador-moron
+Predador-moron
+0
+1
+-1000
+
+INPUTBOX
+65
+528
+220
+588
+chancemor
+10.0
+1
+0
+Number
+
 @#$#@#$#@
 ## WHAT IS IT?
 
@@ -1624,6 +1678,16 @@ false
 Polygon -7500403 true true 200 193 197 249 179 249 177 196 166 187 140 189 93 191 78 179 72 211 49 209 48 181 37 149 25 120 25 89 45 72 103 84 179 75 198 76 252 64 272 81 293 103 285 121 255 121 242 118 224 167
 Polygon -7500403 true true 73 210 86 251 62 249 48 208
 Polygon -7500403 true true 25 114 16 195 9 204 23 213 25 200 39 123
+
+cow skull
+false
+0
+Polygon -7500403 true true 150 90 75 105 60 150 75 210 105 285 195 285 225 210 240 150 225 105
+Polygon -16777216 true false 150 150 90 195 90 150
+Polygon -16777216 true false 150 150 210 195 210 150
+Polygon -16777216 true false 105 285 135 270 150 285 165 270 195 285
+Polygon -7500403 true true 240 150 263 143 278 126 287 102 287 79 280 53 273 38 261 25 246 15 227 8 241 26 253 46 258 68 257 96 246 116 229 126
+Polygon -7500403 true true 60 150 37 143 22 126 13 102 13 79 20 53 27 38 39 25 54 15 73 8 59 26 47 46 42 68 43 96 54 116 71 126
 
 cylinder
 false
@@ -2046,6 +2110,36 @@ Line -7500403 true 216 40 79 269
 Line -7500403 true 40 84 269 221
 Line -7500403 true 40 216 269 79
 Line -7500403 true 84 40 221 269
+
+wolf
+false
+0
+Polygon -7500403 true true 75 225 97 249 112 252 122 252 114 242 102 241 89 224 94 181 64 113 46 119 31 150 32 164 61 204 57 242 85 266 91 271 101 271 96 257 89 257 70 242
+Polygon -7500403 true true 216 73 219 56 229 42 237 66 226 71
+Polygon -7500403 true true 181 106 213 69 226 62 257 70 260 89 285 110 272 124 234 116 218 134 209 150 204 163 192 178 169 185 154 189 129 189 89 180 69 166 63 113 124 110 160 111 170 104
+Polygon -6459832 true false 252 143 242 141
+Polygon -6459832 true false 254 136 232 137
+Line -16777216 false 75 224 89 179
+Line -16777216 false 80 159 89 179
+Polygon -6459832 true false 262 138 234 149
+Polygon -7500403 true true 50 121 36 119 24 123 14 128 6 143 8 165 8 181 7 197 4 233 23 201 28 184 30 169 28 153 48 145
+Polygon -7500403 true true 171 181 178 263 187 277 197 273 202 267 187 260 186 236 194 167
+Polygon -7500403 true true 187 163 195 240 214 260 222 256 222 248 212 245 205 230 205 155
+Polygon -7500403 true true 223 75 226 58 245 44 244 68 233 73
+Line -16777216 false 89 181 112 185
+Line -16777216 false 31 150 47 118
+Polygon -16777216 true false 235 90 250 91 255 99 248 98 244 92
+Line -16777216 false 236 112 246 119
+Polygon -16777216 true false 278 119 282 116 274 113
+Line -16777216 false 189 201 203 161
+Line -16777216 false 90 262 94 272
+Line -16777216 false 110 246 119 252
+Line -16777216 false 190 266 194 274
+Line -16777216 false 218 251 219 257
+Polygon -16777216 true false 230 67 228 54 222 62 224 72
+Line -16777216 false 246 67 234 64
+Line -16777216 false 229 45 235 68
+Line -16777216 false 30 150 30 165
 
 x
 false
