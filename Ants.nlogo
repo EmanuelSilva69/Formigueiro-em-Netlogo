@@ -1028,7 +1028,7 @@ to update-patches-for-season
   ]
 end
 to update-trees
-    if random 100 < 3[ ;%3 de spawnar
+    if random 100 < 10[ ;%3 de spawnar
     create-lucas 1[;; easter egg
       setxy 0 0
       set size 4
@@ -1144,7 +1144,7 @@ end
 to predar
   let predador turtles with [breed = tamanduas or breed = pangolims]
   ask predador [
-    let presas-proximas turtles with [breed = worker-ants or breed = soldier-ants or breed = queen-ants and distance myself < 5]
+    let presas-proximas turtles with [breed = worker-ants or breed = soldier-ants or breed = queen-ants and distance myself < 3]
 
     if any? presas-proximas [
       let presa one-of presas-proximas
