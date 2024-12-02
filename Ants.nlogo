@@ -29,6 +29,9 @@ patches-own [
   food-store2 ; guardar comida no ninho
   food-store3 ; guardar comida no ninho
   food-store4 ; guardar comida no ninho
+  obstáculo?; patch obstáculo
+  obstáculo2?; patch obstáculo
+
 ]
 ; Forma da Formiga ter energia e morrer, além dos atributos que eu criei
 worker-ants-own [energy colony life strenght mutation speed  vitima]
@@ -37,30 +40,15 @@ queen-ants-own [energy colony life strenght mutation speed vitima]
 trees-own [energy]
 pangolims-own [energy colony life strenght speed]
 tamanduas-own [energy colony life strenght speed]
+lucas-own[life strenght speed]
+
 ; === PROCEDIMENTOS DE CONFIGURAÇÃO ===
-
-to predar
-  let predador turtles with [breed = tamanduas or breed = pangolims]
-  ask predador [
-    let presas-proximas turtles with [breed = worker-ants or breed = soldier-ants or breed = queen-ants and distance myself < 3]
-    if any? presas-proximas [
-      let presa one-of presas-proximas
-      ask presa [
-        face self
-        set life life - [strenght] of myself
-      ]
-    ]
-  ]
-end
-
-
 to setup
   clear-all                            ; limpa o mundo e reinicia a simulação
   reset-ticks
-
   set-default-shape worker-ants "bug"       ; define o formato das formigas como "inseto"
    set-default-shape soldier-ants "bug"       ; define o formato das formigas como "inseto"
-   set-default-shape queen-ants "bug"       ; define o formato das formigas como "inseto"
+   set-default-shape queen-ants "ant 2"       ; define o formato das formigas como "inseto"
    set seasons ["Primavera" "Verão" "Outono" "Inverno"]
   set current-season one-of seasons
   print (word "A estação inicial é:  " current-season)
@@ -104,14 +92,18 @@ to setup
   setup-food
   ;setup-nest para nest turtle
   mover-formiga
+  setup-obstaculos
   reset-ticks                           ; reinicia o contador de tempo da simulação
 end
 
 to setup-patches
   ask patches [
+  set obstáculo? false
     setup-nest                          ; configura o ninho nos patches
     ;setup-food                          ; configura as fontes de alimento
     recolor-patch                       ; define as cores dos patches para visualização
+
+
   ]
 end
 to mover-formiga ;comando pra movimentar as formigas
@@ -263,18 +255,21 @@ to recolor-patch  ; procedimento dos patches
       let max-chemical max (list chemical chemical2 chemical3 chemical4)
       if max-chemical > 0.01 [  ; só recolore patches com feromônio
 
-       if max-chemical = chemical [ set pcolor scale-color 117 chemical -11 60 ] ;violeta claro (decidi deixar os feromonios relacionados com as cores pra n ficar um inferno na tela)
+       if max-chemical = chemical [ set pcolor scale-color 117 chemical -11 60] ;violeta claro (decidi deixar os feromonios relacionados com as cores pra n ficar um inferno na tela)
       if max-chemical = chemical2 [ set pcolor scale-color cyan chemical2 -11 60 ] ;variação de azul
       if max-chemical = chemical3 [ set pcolor scale-color 137 chemical3 -11 60 ] ;magenta é daqui pra lá pra rosa.
       if max-chemical = chemical4 [ set pcolor scale-color 48 chemical4 -11 60 ] ; amarelo n tem pra onde fugir n, netlogo n tem muitas cores de amarelo .-.
       ]
+      if obstáculo? = false [
       if max-chemical < 0.01 [
       ;; Reset to the base color of the current season
       if current-season = "Primavera" [ set pcolor 63 ]
       if current-season = "Verão" [ set pcolor 43 ]
       if current-season = "Outono" [ set pcolor 23 ]
       if current-season = "Inverno" [ set pcolor white ]
-    ]
+      ]]
+
+      if obstáculo? = true [set pcolor gray]
   ]]
     if nest2? [
     set pcolor blue                  ; patches do ninho em  azul (ninho 2)
@@ -293,7 +288,6 @@ end
 ; === PROCEDIMENTOS PRINCIPAIS ===
 
 to go
-  predar
   ask worker-ants [
     if colony = blue[
      if ticks < (ticks - ticks mod 4) and ticks mod 4 != 2 [stop]     ; sincroniza a saída das formigas do ninho com o tempo para qur todas saiam juntas
@@ -312,8 +306,8 @@ to go
         [look-for-food4 ] [ return-to-nest4 ]]
 
     wiggle                               ; movimento aleatório para simular procura
-    fd speed                                 ; move-se para frente
-    set energy energy - 2                ; Diminui a energia delas
+    move-forward speed                                 ; move-se para frente
+    set energy energy - 1                ; Diminui a energia delas
   ]
   ask soldier-ants [
     if colony = violet[
@@ -380,12 +374,7 @@ to go
   ]]]
    ]]
 
-;;Easter egg
-  ask lucas[
 
-    wiggle                               ; movimento aleatório para simular procura
-    move-forward speed                                 ; move-se para frente
-    easteregg] ; assassinato ]
 
 
  diffuse chemical (diffusion-rate / 100) ;difusão dos feromonios
@@ -401,7 +390,6 @@ to go
   ]
 
   ask tamanduas[
-    predar
     wiggle
     fd speed
   ]
@@ -409,10 +397,13 @@ to go
         wiggle
     fd speed
   ]
-
   handle-season-change
   kill-nestvazia
   predar
+  ask lucas[
+     wiggle                               ; movimento aleatório para simular procura
+    move-forward speed                                 ; move-se para frente
+    easter-egglucas] ; cometer assassinato
   check-death
   tick                                  ; avança o contador de tempo da simulação
 
@@ -534,10 +525,10 @@ to patrulha-ou-luta
      [
     set role "fighting"      ;; Muda o trabalho para Modo Lutador, pra meter a porrada nos trabalhadores inocentes (que nem a vida real)
     let inimigo-atual one-of inimigos-proximos
-   face inimigo-atual ;; vira-se para o inimigo
-   fd 1 ;; move-se um passo em direção ao inimigo
+    face inimigo-atual  ;; Vira-se para o inimigo
+    fd 1                ;; Move-se 1 passo em direção ao inimigo
     ask inimigo-atual[
-      face myself
+      face self
       set life life - [strenght] of myself
   ]]
      [
@@ -545,6 +536,21 @@ to patrulha-ou-luta
   ]
 
 end
+to easter-egglucas
+ if breed = lucas[
+  let inimigos-proximos turtles with [(breed != trees) and (breed != lucas) and (distance myself < 10) ]
+  if any?  inimigos-proximos ;;pra impedir as formigas de atacarem as arvores
+     [
+    let inimigo-atual one-of inimigos-proximos
+    face inimigo-atual  ;; Vira-se para o inimigo
+    fd 1                ;; Move-se 1 passo em direção ao inimigo
+    ask inimigo-atual[
+      face self
+      set life life - [strenght] of myself
+  ]]]
+end
+
+
 
 to kill-nestvazia ;acabar com as nests vazias.
    ;; Verifica os ninhos e suas respectivas rainhas
@@ -607,7 +613,7 @@ to nascimento
       setxy -16 -36  ;; Spawnar perto da rainha violeta
       set shape "bug"
       set color violet
-      set energy 10
+      set energy 100
       set size 1.5
       set colony violet
      ; mover-formiga ;; Spawnar perto da rainha violeta
@@ -617,7 +623,7 @@ to nascimento
       setxy -18 -38  ;; Spawnar perto da rainha violeta
       set shape "bug"
       set color violet + 3
-      set energy 10
+      set energy 100
       set size 2.5
       set colony violet
       aplicar-atributos
@@ -656,7 +662,7 @@ to nascimento
        setxy -30 36  ;; Spawnar perto da rainha magenta
       set shape "bug"
       set color 126
-      set energy 10
+      set energy 100
       set size 1.5
           set colony 126
         ;mover-formiga ;; Spawnar perto da rainha magenta
@@ -682,7 +688,7 @@ to nascimento
            setxy 26 47  ;; Spawnar perto da rainha amarela
       set shape "bug"
       set color yellow
-      set energy 10
+      set energy 100
       set size 1.5
       set colony yellow
       aplicar-atributos
@@ -716,7 +722,7 @@ to uphill-chemical  ; procedimento das formigas
   ]
   [
     wiggle  ; Movimento randômico se não houver feromônio detectado
-    fd 1
+    move-forward 1
   ]
   ]
 end
@@ -735,7 +741,7 @@ to uphill-chemical2  ; procedimento das formigas
   ]
   [
     wiggle  ; Movimento randômico se não houver feromônio detectado
-    fd 1
+    move-forward 1
   ]
   ]
 end
@@ -778,6 +784,8 @@ to uphill-nest-scent  ;; turtle procedure
   [ ifelse scent-right > scent-left
     [ rt 45 ]
     [ lt 45 ] ]
+   let obstaculo one-of patches in-radius 1 with [obstáculo?]
+  if obstaculo = true [ rt 180 ]
 end
 to uphill-nest-scent2  ; procedimento das formigas
   let scent-ahead nest-scent-at-angle2 0
@@ -790,6 +798,8 @@ to uphill-nest-scent2  ; procedimento das formigas
       lt 45                              ; vira 45 graus à esquerda
     ]
   ]
+   let obstaculo one-of patches in-radius 1 with [obstáculo?]
+  if obstaculo = true [ rt 180 ]
 end
 to uphill-nest-scent3  ; procedimento das formigas
   let scent-ahead nest-scent-at-angle3 0
@@ -802,6 +812,8 @@ to uphill-nest-scent3  ; procedimento das formigas
       lt 45                              ; vira 45 graus à esquerda
     ]
   ]
+   let obstaculo one-of patches in-radius 1 with [obstáculo?]
+  if obstaculo = true [ rt 180 ]
 end
 to uphill-nest-scent4  ; procedimento das formigas
   let scent-ahead nest-scent-at-angle4 0
@@ -814,12 +826,17 @@ to uphill-nest-scent4  ; procedimento das formigas
       lt 45                              ; vira 45 graus à esquerda
     ]
   ]
+   let obstaculo one-of patches in-radius 1 with [obstáculo?]
+  if obstaculo = true [ rt 180 ]
 end
 
-to wiggle  ; procedimento das formigas
+to wiggle  ; procedimento das formigas  MODIFICADO PARA EVITAR OBSTACULO
+
   rt random 45                           ; vira um ângulo aleatório à direita
   lt random 45                           ; vira um ângulo aleatório à esquerda
   if not can-move? 1 [ rt 180 ]          ; se não puder se mover, vira 180 graus
+  let obstaculo one-of patches in-radius 1 with [obstáculo?]
+  if obstaculo = true [ rt 180 ]
 end
 
 to movimento-soldado
@@ -831,16 +848,16 @@ to movimento-soldado
 
   ;; Move in a circular pattern by adjusting the heading randomly and moving forward
   set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  fd speed ;; Move forward
+  move-forward speed ;; Move forward
 
   ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
   ifelse distancexy nest-x nest-y < 3 [
     rt random 90  ;; Turn randomly to avoid staying at the same spot
-    fd speed        ;; Move forward
+    move-forward speed        ;; Move forward
   ][
     ;; Continue patrolling around the defined spot
     rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    fd speed    ;; Move forward
+    move-forward speed    ;; Move forward
   ]]
 
 
@@ -857,16 +874,16 @@ to movimento-soldado2
 
   ;; Move in a circular pattern by adjusting the heading randomly and moving forward
   set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  fd speed  ;; Move forward
+  move-forward speed  ;; Move forward
 
   ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
   ifelse distancexy nest-x nest-y < 3 [
     rt random 90  ;; Turn randomly to avoid staying at the same spot
-    fd speed         ;; Move forward
+    move-forward speed         ;; Move forward
   ][
     ;; Continue patrolling around the defined spot
     rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    fd speed    ;; Move forward
+    move-forward speed    ;; Move forward
   ]]
 end
 to movimento-soldado3
@@ -881,16 +898,16 @@ to movimento-soldado3
 
   ;; Move in a circular pattern by adjusting the heading randomly and moving forward
   set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  fd speed  ;; Move forward
+  move-forward speed  ;; Move forward
 
   ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
   ifelse distancexy nest-x nest-y < 3 [
     rt random 90  ;; Turn randomly to avoid staying at the same spot
-    fd speed         ;; Move forward
+    move-forward speed         ;; Move forward
   ][
     ;; Continue patrolling around the defined spot
     rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    fd speed    ;; Move forward
+    move-forward speed    ;; Move forward
   ]]
 end
 to movimento-soldado4
@@ -905,16 +922,16 @@ to movimento-soldado4
 
   ;; Move in a circular pattern by adjusting the heading randomly and moving forward
   set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  fd speed  ;; Move forward
+  move-forward speed  ;; Move forward
 
   ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
   ifelse distancexy nest-x nest-y < 3 [
     rt random 90  ;; Turn randomly to avoid staying at the same spot
-    fd speed        ;; Move forward
+    move-forward speed        ;; Move forward
   ][
     ;; Continue patrolling around the defined spot
     rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    fd speed   ;; Move forward
+    move-forward speed   ;; Move forward
   ]]
   if role = "fighting"[
 
@@ -986,17 +1003,22 @@ to update-patches-for-season
     if current-season = "Primavera" [
      if pcolor = white[
       set pcolor 63
+
+
     ]
       if pcolor = black[
       set pcolor 63
+
     ]]
     if current-season = "Verão" [
       if pcolor = 63[
       set pcolor 43
+
     ]]
     if current-season = "Outono" [ ; como a cor dai é predominante laranja, tive que modificar a cor base pra n dar problema na hora de aparecer as coisas.
       if pcolor = 43[
       set pcolor 23
+
     ]]
     if current-season = "Inverno" [
       if pcolor = 23[
@@ -1011,8 +1033,12 @@ to update-trees
       setxy 0 0
       set size 4
     set color 136
-      set shape "person"
+      set shape "person soldier"
       set label "Lucas o intruso do formigueiro"
+      set strenght 10000
+      set life 100000
+      set speed 1
+
     ]
   ]
   repeat num-predador[
@@ -1114,32 +1140,16 @@ to gerar-predador ;pangolims-own [energy colony life strenght speed]
 
   ]]
 end
-<<<<<<< HEAD
 
 to predar
   let predador turtles with [breed = tamanduas or breed = pangolims]
   ask predador [
-    let presas-proximas turtles with [breed = worker-ants or breed = soldier-ants or breed = queen-ants and distance myself < 3]
-    if any? presas-proximas [
-      let presa one-of presas-proximas
-      face presa
-      fd 1
-      ask presa [
-        face self
-        set life life - [strenght] of myself
-      ]
-    ]
-  ]
-end
+    let presas-proximas turtles with [breed = worker-ants or breed = soldier-ants or breed = queen-ants and distance myself < 5]
 
-to easteregg
-  let predador turtles with [breed = lucas ]
-  ask predador [
-    let presas-proximas turtles with [breed = worker-ants or breed = soldier-ants or breed = queen-ants and breed = tamanduas or breed = pangolims and distance myself < 5]
     if any? presas-proximas [
       let presa one-of presas-proximas
-      face presa
-      fd 1
+      face presa  ;; Vira-se para o inimigo
+      fd 1                ;; Move-se 1 passo em direção ao inimigo
       ask presa [
         face self
         set life life - [strenght] of myself
@@ -1186,8 +1196,6 @@ to move-forward [steps]
 
 end
 
-=======
->>>>>>> df8546144cdef750cec7101852314f7677f49540
 ; === INFORMAÇÕES ADICIONAIS ===
 
 ; Este modelo simula o comportamento de formigas em busca de alimento e retorno ao ninho.
@@ -1252,7 +1260,7 @@ diffusion-rate
 diffusion-rate
 0.0
 99.0
-49.0
+52.0
 1.0
 1
 NIL
@@ -1267,11 +1275,7 @@ evaporation-rate
 evaporation-rate
 0.0
 99.0
-<<<<<<< HEAD
-33.0
-=======
-60.0
->>>>>>> df8546144cdef750cec7101852314f7677f49540
+57.0
 1.0
 1
 NIL
@@ -1303,7 +1307,7 @@ population
 population
 0.0
 200.0
-38.0
+25.0
 1.0
 1
 NIL
@@ -1369,7 +1373,7 @@ Popsold
 Popsold
 0
 200
-18.0
+11.0
 1
 1
 NIL
@@ -1384,7 +1388,7 @@ nascimentoformiga
 nascimentoformiga
 0
 100
-15.0
+13.0
 1
 1
 NIL
@@ -1399,7 +1403,7 @@ Preçoconstrução
 Preçoconstrução
 0
 200
-41.0
+51.0
 1
 1
 NIL
@@ -1411,11 +1415,7 @@ INPUTBOX
 430
 388
 tamanhoseason
-<<<<<<< HEAD
-500.0
-=======
-200.0
->>>>>>> df8546144cdef750cec7101852314f7677f49540
+100.0
 1
 0
 Number
@@ -1429,7 +1429,7 @@ chancedomida
 chancedomida
 0
 100
-25.0
+13.0
 1
 1
 NIL
@@ -1444,11 +1444,7 @@ num-predador
 num-predador
 0
 100
-<<<<<<< HEAD
-6.0
-=======
 9.0
->>>>>>> df8546144cdef750cec7101852314f7677f49540
 1
 1
 NIL
@@ -1463,7 +1459,7 @@ chancepredador
 chancepredador
 0
 100
-39.0
+18.0
 1
 1
 NIL
@@ -1549,6 +1545,21 @@ airplane
 true
 0
 Polygon -7500403 true true 150 0 135 15 120 60 120 105 15 165 15 195 120 180 135 240 105 270 120 285 150 270 180 285 210 270 165 240 180 180 285 195 285 165 180 105 180 60 165 15
+
+ant 2
+true
+0
+Polygon -7500403 true true 150 19 120 30 120 45 130 66 144 81 127 96 129 113 144 134 136 185 121 195 114 217 120 255 135 270 165 270 180 255 188 218 181 195 165 184 157 134 170 115 173 95 156 81 171 66 181 42 180 30
+Polygon -7500403 true true 150 167 159 185 190 182 225 212 255 257 240 212 200 170 154 172
+Polygon -7500403 true true 161 167 201 150 237 149 281 182 245 140 202 137 158 154
+Polygon -7500403 true true 155 135 185 120 230 105 275 75 233 115 201 124 155 150
+Line -7500403 true 120 36 75 45
+Line -7500403 true 75 45 90 15
+Line -7500403 true 180 35 225 45
+Line -7500403 true 225 45 210 15
+Polygon -7500403 true true 145 135 115 120 70 105 25 75 67 115 99 124 145 150
+Polygon -7500403 true true 139 167 99 150 63 149 19 182 55 140 98 137 142 154
+Polygon -7500403 true true 150 167 141 185 110 182 75 212 45 257 60 212 100 170 146 172
 
 arrow
 true
