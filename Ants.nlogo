@@ -258,7 +258,7 @@ to recolor-patch  ; procedimento dos patches
        if max-chemical = chemical [ set pcolor scale-color 117 chemical -11 60] ;violeta claro (decidi deixar os feromonios relacionados com as cores pra n ficar um inferno na tela)
       if max-chemical = chemical2 [ set pcolor scale-color cyan chemical2 -11 60 ] ;variação de azul
       if max-chemical = chemical3 [ set pcolor scale-color 137 chemical3 -11 60 ] ;magenta é daqui pra lá pra rosa.
-      if max-chemical = chemical4 [ set pcolor scale-color 48 chemical4 -11 100 ] ; amarelo n tem pra onde fugir n, netlogo n tem muitas cores de amarelo .-.
+      if max-chemical = chemical4 [ set pcolor scale-color 48 chemical4 -11 60 ] ; amarelo n tem pra onde fugir n, netlogo n tem muitas cores de amarelo .-.
       ]
       if obstáculo? = false [
       if max-chemical < 0.01 [
