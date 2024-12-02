@@ -515,11 +515,18 @@ to check-death ;ver se a formiga vai morrer
     ]
 end
 to patrulha-ou-luta
-  ifelse any? other turtles with [ (breed != trees) and ;;pra impedir as formigas de atacarem as arvores
-  (breed = worker-ants or breed = soldier-ants or breed = queen-ants or breed = pangolims or breed = tamanduas) and
-  (colony != [colony] of myself) and  (distance myself < 30)]
+  let inimigos-proximos turtles with [(breed != trees) and (breed = worker-ants or breed = soldier-ants or breed = queen-ants or breed = pangolims or breed = tamanduas) and
+    (colony != [colony] of myself) and  (distance myself < 10)]
+  ifelse any?  inimigos-proximos ;;pra impedir as formigas de atacarem as arvores
      [
-    set role "fighting"      ];; Muda o trabalho para Modo Lutador, pra meter a porrada nos trabalhadores inocentes (que nem a vida real)
+    set role "fighting"      ;; Muda o trabalho para Modo Lutador, pra meter a porrada nos trabalhadores inocentes (que nem a vida real)
+    let inimigo-atual one-of inimigos-proximos
+    face inimigo-atual ;; vira-se para o inimigo
+    fd 1 ;; move-se um passo em direção ao inimigo
+    ask inimigo-atual[
+      face self
+      set life life - [strenght] of myself
+  ]]
      [
     set role "patrolling"    ;; Caso n veja nenhum inimigo, continuar patrulhando o ninho original.
   ]
