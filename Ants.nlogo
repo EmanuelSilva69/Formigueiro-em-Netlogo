@@ -400,6 +400,7 @@ to go
   check-death
   handle-season-change
   kill-nestvazia
+  predar
   tick                                  ; avança o contador de tempo da simulação
 
 end
@@ -498,18 +499,20 @@ end
 
 to check-death ;ver se a formiga vai morrer
   ask worker-ants [
-    if energy <= 0 [ die ]
+    if energy <= 0 or life <= 0 [ die ]
   ]
     ask soldier-ants [
-    if energy <= 0 [ die ]
+    if energy <= 0 or life <= 0 [ die ]
   ]
   ask queen-ants [
-    if energy <= 0 [ die ]
+    if energy <= 0 or life <= 0 [ die ]
   ]
   ask tamanduas[
-   if energy <= 0 [ die ]]
+   if energy <= 0 or life <= 0 [ die ]
+  ]
    ask pangolims[
-   if energy <= 0 [ die ]]
+  if energy <= 0 or life <= 0 [ die ]
+    ]
 end
 to patrulha-ou-luta
   ifelse any? other turtles with [ (breed != trees) and ;;pra impedir as formigas de atacarem as arvores
@@ -1114,6 +1117,21 @@ to gerar-predador ;pangolims-own [energy colony life strenght speed]
 
   ]]
 end
+
+to predar
+  let predador turtles with [breed = tamanduas or breed = pangolims]
+  ask predador [
+    let presas-proximas turtles with [breed = worker-ants or breed = soldier-ants or breed = queen-ants and distance myself < 3]
+    if any? presas-proximas [
+      let presa one-of presas-proximas
+      ask presa [
+        face self
+        set life life - [strenght] of myself
+      ]
+    ]
+  ]
+end
+
 ;== Obstáculos ==
 to setup-obstaculos
    ask patches [
