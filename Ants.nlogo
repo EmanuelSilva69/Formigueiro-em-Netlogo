@@ -413,6 +413,7 @@ to go
   handle-season-change
   kill-nestvazia
   predar
+
   check-death
   tick                                  ; avança o contador de tempo da simulação
 
@@ -534,10 +535,13 @@ to patrulha-ou-luta
      [
     set role "fighting"      ;; Muda o trabalho para Modo Lutador, pra meter a porrada nos trabalhadores inocentes (que nem a vida real)
     let inimigo-atual one-of inimigos-proximos
+
    face inimigo-atual ;; vira-se para o inimigo
    fd 1 ;; move-se um passo em direção ao inimigo
     ask inimigo-atual[
       face myself
+
+
       set life life - [strenght] of myself
   ]]
      [
@@ -1114,7 +1118,7 @@ to gerar-predador ;pangolims-own [energy colony life strenght speed]
 
   ]]
 end
-<<<<<<< HEAD
+
 
 to predar
   let predador turtles with [breed = tamanduas or breed = pangolims]
@@ -1122,6 +1126,7 @@ to predar
     let presas-proximas turtles with [breed = worker-ants or breed = soldier-ants or breed = queen-ants and distance myself < 3]
     if any? presas-proximas [
       let presa one-of presas-proximas
+
       face presa
       fd 1
       ask presa [
@@ -1140,6 +1145,7 @@ to easteregg
       let presa one-of presas-proximas
       face presa
       fd 1
+
       ask presa [
         face self
         set life life - [strenght] of myself
@@ -1186,8 +1192,7 @@ to move-forward [steps]
 
 end
 
-=======
->>>>>>> df8546144cdef750cec7101852314f7677f49540
+
 ; === INFORMAÇÕES ADICIONAIS ===
 
 ; Este modelo simula o comportamento de formigas em busca de alimento e retorno ao ninho.
@@ -1267,11 +1272,9 @@ evaporation-rate
 evaporation-rate
 0.0
 99.0
-<<<<<<< HEAD
+
 33.0
-=======
-60.0
->>>>>>> df8546144cdef750cec7101852314f7677f49540
+
 1.0
 1
 NIL
@@ -1411,11 +1414,9 @@ INPUTBOX
 430
 388
 tamanhoseason
-<<<<<<< HEAD
+
 500.0
-=======
-200.0
->>>>>>> df8546144cdef750cec7101852314f7677f49540
+0
 1
 0
 Number
@@ -1444,11 +1445,9 @@ num-predador
 num-predador
 0
 100
-<<<<<<< HEAD
+
 6.0
-=======
-9.0
->>>>>>> df8546144cdef750cec7101852314f7677f49540
+
 1
 1
 NIL
