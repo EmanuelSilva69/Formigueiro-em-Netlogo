@@ -1121,7 +1121,7 @@ end
 to gerar-predador ;pangolims-own [energy colony life strenght speed]
 
   ifelse random 100 < 50[ ; 50% de gerar um ou outro
-  create-tamanduas random 3[
+  create-tamanduas random 2[
       set shape "tamandua"
       set color brown
       set size 17
@@ -1132,7 +1132,7 @@ to gerar-predador ;pangolims-own [energy colony life strenght speed]
       set strenght 87
       set speed 1
   ]]
-  [create-pangolims random 5 + 1 [
+  [create-pangolims random 4 [
       set shape "pangolim"
       set color 37
       set size 12
