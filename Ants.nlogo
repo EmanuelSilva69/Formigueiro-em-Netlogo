@@ -258,7 +258,7 @@ to recolor-patch  ; procedimento dos patches
        if max-chemical = chemical [ set pcolor scale-color 117 chemical -11 60] ;violeta claro (decidi deixar os feromonios relacionados com as cores pra n ficar um inferno na tela)
       if max-chemical = chemical2 [ set pcolor scale-color cyan chemical2 -11 60 ] ;variação de azul
       if max-chemical = chemical3 [ set pcolor scale-color 137 chemical3 -11 60 ] ;magenta é daqui pra lá pra rosa.
-      if max-chemical = chemical4 [ set pcolor scale-color 48 chemical4 -11 100 ] ; amarelo n tem pra onde fugir n, netlogo n tem muitas cores de amarelo .-.
+      if max-chemical = chemical4 [ set pcolor scale-color 48 chemical4 -11 60 ] ; amarelo n tem pra onde fugir n, netlogo n tem muitas cores de amarelo .-.
       ]
       if obstáculo? = false [
       if max-chemical < 0.01 [
@@ -374,7 +374,12 @@ to go
   ]]]
    ]]
 
+;;Easter egg
+  ask lucas[
 
+    wiggle                               ; movimento aleatório para simular procura
+    move-forward speed                                 ; move-se para frente
+    easteregg] ; assassinato ]
 
 
  diffuse chemical (diffusion-rate / 100) ;difusão dos feromonios
@@ -397,9 +402,11 @@ to go
         wiggle
     fd speed
   ]
-  check-death
+
   handle-season-change
   kill-nestvazia
+  predar
+  check-death
   tick                                  ; avança o contador de tempo da simulação
 
 end
@@ -498,34 +505,40 @@ end
 
 to check-death ;ver se a formiga vai morrer
   ask worker-ants [
-    if energy <= 0 [ die ]
+    if energy <= 0 or life <= 0 [ die ]
   ]
     ask soldier-ants [
-    if energy <= 0 [ die ]
+    if energy <= 0 or life <= 0 [ die ]
   ]
   ask queen-ants [
-    if energy <= 0 [ die ]
+    if energy <= 0 or life <= 0 [ die ]
   ]
   ask tamanduas[
-   if energy <= 0 [ die ]]
+   if energy <= 0 or life <= 0 [ die ]
+  ]
    ask pangolims[
-   if energy <= 0 [ die ]]
+  if energy <= 0 or life <= 0 [ die ]
+    ]
 end
 to patrulha-ou-luta
-  ifelse any? other turtles with [ (breed != trees) and ;;pra impedir as formigas de atacarem as arvores
-  (breed = worker-ants or breed = soldier-ants or breed = queen-ants or breed = pangolims or breed = tamanduas) and
-  (colony != [colony] of myself) and  (distance myself < 30)]
+  let inimigos-proximos turtles with [(breed != trees) and (breed = worker-ants or breed = soldier-ants or breed = queen-ants or breed = pangolims or breed = tamanduas) and
+    (colony != [colony] of myself) and  (distance myself < 10)]
+  ifelse any?  inimigos-proximos ;;pra impedir as formigas de atacarem as arvores
      [
-    set role "fighting"      ];; Muda o trabalho para Modo Lutador, pra meter a porrada nos trabalhadores inocentes (que nem a vida real)
+    set role "fighting"      ;; Muda o trabalho para Modo Lutador, pra meter a porrada nos trabalhadores inocentes (que nem a vida real)
+    let inimigo-atual one-of inimigos-proximos
+   face inimigo-atual ;; vira-se para o inimigo
+   fd 1 ;; move-se um passo em direção ao inimigo
+    ask inimigo-atual[
+      face myself
+      set life life - [strenght] of myself
+  ]]
      [
     set role "patrolling"    ;; Caso n veja nenhum inimigo, continuar patrulhando o ninho original.
   ]
 
 end
-to attack ;começar a fazer o Combate das formigas
 
-
-end
 to kill-nestvazia ;acabar com as nests vazias.
    ;; Verifica os ninhos e suas respectivas rainhas
   ask patches with [nest? or nest2? or nest3? or nest4?] [
@@ -1114,6 +1127,39 @@ to gerar-predador ;pangolims-own [energy colony life strenght speed]
 
   ]]
 end
+
+to predar
+  let predador turtles with [breed = tamanduas or breed = pangolims]
+  ask predador [
+    let presas-proximas turtles with [breed = worker-ants or breed = soldier-ants or breed = queen-ants and distance myself < 3]
+    if any? presas-proximas [
+      let presa one-of presas-proximas
+      face presa
+      fd 1
+      ask presa [
+        face self
+        set life life - [strenght] of myself
+      ]
+    ]
+  ]
+end
+
+to easteregg
+  let predador turtles with [breed = lucas ]
+  ask predador [
+    let presas-proximas turtles with [breed = worker-ants or breed = soldier-ants or breed = queen-ants and breed = tamanduas or breed = pangolims and distance myself < 5]
+    if any? presas-proximas [
+      let presa one-of presas-proximas
+      face presa
+      fd 1
+      ask presa [
+        face self
+        set life life - [strenght] of myself
+      ]
+    ]
+  ]
+end
+
 ;== Obstáculos ==
 to setup-obstaculos
    ask patches [
@@ -1231,7 +1277,7 @@ evaporation-rate
 evaporation-rate
 0.0
 99.0
-57.0
+33.0
 1.0
 1
 NIL
@@ -1263,7 +1309,7 @@ population
 population
 0.0
 200.0
-25.0
+38.0
 1.0
 1
 NIL
@@ -1329,7 +1375,7 @@ Popsold
 Popsold
 0
 200
-11.0
+18.0
 1
 1
 NIL
@@ -1359,7 +1405,7 @@ Preçoconstrução
 Preçoconstrução
 0
 200
-51.0
+41.0
 1
 1
 NIL
@@ -1371,7 +1417,7 @@ INPUTBOX
 430
 388
 tamanhoseason
-100.0
+500.0
 1
 0
 Number
@@ -1385,7 +1431,7 @@ chancedomida
 chancedomida
 0
 100
-13.0
+25.0
 1
 1
 NIL
@@ -1400,7 +1446,7 @@ num-predador
 num-predador
 0
 100
-5.0
+6.0
 1
 1
 NIL
