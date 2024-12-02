@@ -1,0 +1,15 @@
+Emanuel - 
+1-	Implementar a morte das formigas ( sistema de energia) ok
+2-	 Classes de formiga  OK
+3-	- atributos aleatórios (atributos fixos mas mutação aleatória) OK
+4-	- mudança de estações OK
+6-	- predadores( design) OK
+7-	- interação dos predadores OK (predador mor mata tamandua e pangolim)
+8-	[Spawn aleatório das formigas com atributos pré-definidos(não é aleatório, mas tem os atributos) OK ( efeito de mutação)
+9-	[- raças diferentes de formigas com atributos diferentes OK
+10-	Criar arvores para a comida ficar ao redor! ok
+11-	Ninhos diferentes OK com cores diferentes
+Resolver o return-to-nest com 4 nests OK
+Thales 
+5-	- briga de formiga  OK
+6-	- predadores (luta) OK
