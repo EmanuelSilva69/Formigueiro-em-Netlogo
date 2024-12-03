@@ -404,6 +404,7 @@ to go
   ]
   handle-season-change
   kill-nestvazia
+  ask worker-ants [fugir-do-predador]
   predar
   ask lucas[
      wiggle                               ; movimento aleatório para simular procura
@@ -1189,7 +1190,21 @@ to predar
     ]
   ]]
 end
+to fugir-do-predador
+  let predadores-proximos turtles with [
+    (breed = tamanduas or breed = pangolims) and
+    (distance myself < 5)  ;; Distância de segurança
+  ]
 
+  if any? predadores-proximos [
+    let predador-mais-proximo min-one-of predadores-proximos [distance myself]
+    ;; Virar na direção oposta ao predador
+    let angulo-oposto (towards predador-mais-proximo + 180) mod 360
+    facexy (xcor + cos angulo-oposto) (ycor + sin angulo-oposto)
+    ;; Mover-se rapidamente para longe
+    fd 1.5
+  ]
+end
 ;== Obstáculos ==
 to setup-obstaculos
    ask patches [
@@ -1227,6 +1242,7 @@ to move-forward [steps]
   ]
 
 end
+
 
 ; === INFORMAÇÕES ADICIONAIS ===
 
@@ -1461,7 +1477,7 @@ chancedomida
 chancedomida
 0
 100
-13.0
+73.0
 1
 1
 NIL
@@ -1476,7 +1492,7 @@ num-predador
 num-predador
 0
 100
-9.0
+3.0
 1
 1
 NIL
@@ -1491,7 +1507,7 @@ chancepredador
 chancepredador
 0
 100
-18.0
+20.0
 1
 1
 NIL
@@ -1504,7 +1520,7 @@ SWITCH
 580
 Predador-moron
 Predador-moron
-0
+1
 1
 -1000
 
@@ -1514,7 +1530,7 @@ INPUTBOX
 220
 588
 chancemor
-10.0
+20.0
 1
 0
 Number
