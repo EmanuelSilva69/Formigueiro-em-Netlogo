@@ -939,10 +939,8 @@ to movimento-soldado4
     rt 15  ;; Rotate by a small amount to keep patrolling in a circle
     move-forward speed   ;; Move forward
   ]]
-  if role = "fighting"[
+   end
 
-  ]
-end
 
 ; === FUNÇÕES AUXILIARES ===
 
