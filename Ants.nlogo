@@ -526,7 +526,7 @@ to check-death ;ver se a formiga vai morrer
 end
 to patrulha-ou-luta
   let inimigos-proximos turtles with [(breed != trees) and (breed = worker-ants or breed = soldier-ants or breed = queen-ants or breed = pangolims or breed = tamanduas) and
-    (colony != [colony] of myself) and  (distance myself < 10)]
+    (colony != [colony] of myself) and  (distance myself < 5)]
   ifelse any?  inimigos-proximos ;;pra impedir as formigas de atacarem as arvores
      [
     set role "fighting"      ;; Muda o trabalho para Modo Lutador, pra meter a porrada nos trabalhadores inocentes (que nem a vida real)
