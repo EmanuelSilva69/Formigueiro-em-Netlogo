@@ -73,14 +73,7 @@ to setup
     set role "Patrulha"
     aplicar-atributos
   ]
-    create-trees 2 [
-    set shape "tree"
-    set size 15
-    move-to one-of patches with [not any? turtles-here]
-    set color green
-    set energy 1000000000000000
 
-  ]
     create-queen-ants 1 [
     set vitima false
     set size 4                         ; aumenta o tamanho para melhor visualização
@@ -90,6 +83,20 @@ to setup
     aplicar-atributos
   ]
   ]
+  ifelse arvorerandom = false[
+  create-trees num-arvore [
+    set shape "tree"
+    set size 15
+    move-to one-of patches with [not any? turtles-here]
+    set color green
+    set energy 1000000000000000
+
+  ]][ create-trees random 100 [
+    set shape "tree"
+    set size 15
+    move-to one-of patches with [not any? turtles-here]
+    set color green
+      set energy 1000000000000000]]
   setup-patches                         ; chama o procedimento para configurar os patches
   setup-food
   ;setup-nest para nest turtle
@@ -533,10 +540,11 @@ to patrulha-ou-luta
     let inimigo-atual one-of inimigos-proximos
     face inimigo-atual  ;; Vira-se para o inimigo
     fd 1                ;; Move-se 1 passo em direção ao inimigo
+     if distance  inimigo-atual < 4[
     ask inimigo-atual[
       face self
       set life life - [strenght] of myself
-  ]]
+  ]]]
      [
     set role "patrolling"    ;; Caso n veja nenhum inimigo, continuar patrulhando o ninho original.
   ]
@@ -638,7 +646,7 @@ to nascimento
 
  if colony = blue[
     ask queen-ants[
-      let num-new-ants random 9 + 1  ;; fazer nascer de 1 a 9
+      let num-new-ants nascimentoformiga + random 10  ;; slide do nascimento de formiga + incremento de 0 a 10  aleatório ->
      hatch-worker-ants num-new-ants [
        setxy 40 -32  ;; Spawnar perto da rainha azul (
       set shape "bug"
@@ -663,7 +671,7 @@ to nascimento
   if colony = 126[
     ask queen-ants[
 
-      let num-new-ants random 9 + 1  ;; fazer nascer de 1 a 9
+      let num-new-ants nascimentoformiga + random 10  ;; slide do nascimento de formiga + incremento de 0 a 10  aleatório
      hatch-worker-ants num-new-ants [
        setxy -30 36  ;; Spawnar perto da rainha magenta
       set shape "bug"
@@ -689,7 +697,7 @@ to nascimento
   if colony = yellow[
     ask queen-ants[
 
-      let num-new-ants random 9 + 1  ;; fazer nascer de 1 a 9
+      let num-new-ants nascimentoformiga + random 10 ;; slide do nascimento de formiga + incremento de 0 a 10  aleatório
      hatch-worker-ants num-new-ants [
            setxy 26 47  ;; Spawnar perto da rainha amarela
       set shape "bug"
@@ -1055,40 +1063,13 @@ to update-trees
       set color pink
       ]
 
-      ask turtles with [shape = "tree"] [
-    ; Para cada árvore, define patches ao redor como fontes de alimento
-    let nearby-patches patches in-radius 9 ; Ajuste o raio conforme necessário
-    ask nearby-patches [
-      if random 100 < chancedomida [ ; 50% de chance de gerar comida em cada patch ao redor
-        set food one-of [1 2] ; Define quantidade de comida aleatória (1 ou 2)
-        set food-source-number [who] of myself ; Identifica a árvore como fonte de alimento
-        if food = 1 [ set pcolor red ] ; Comida 1 -> vermelho
-        if food = 2 [ set pcolor orange ]   ; Comida 2 -> laranja
-        if food = 1[ set food-source-number 1]
-        if food = 2[ set food-source-number 2]
-      ]
-    ]
-  ]
+
   ]
   if current-season = "Verão" [
     ask turtles with [shape = "tree"] [
       set color 47
       ]
 
-      ask turtles with [shape = "tree"] [
-    ; Para cada árvore, define patches ao redor como fontes de alimento
-    let nearby-patches patches in-radius 9 ; Ajuste o raio conforme necessário
-    ask nearby-patches [
-      if random 100 < chancedomida [ ; 50% de chance de gerar comida em cada patch ao redor
-        set food one-of [1 2] ; Define quantidade de comida aleatória (1 ou 2)
-        set food-source-number [who] of myself ; Identifica a árvore como fonte de alimento
-        if food = 1 [ set pcolor red ] ; Comida 1 -> vermelho
-        if food = 2 [ set pcolor orange ]   ; Comida 2 -> laranja
-        if food = 1[ set food-source-number 1]
-        if food = 2[ set food-source-number 2]
-      ]
-    ]
-  ]
   ]
   if current-season = "Outono" [
        ask turtles with [shape = "tree"] [
@@ -1122,7 +1103,7 @@ end
 to gerar-predador ;pangolims-own [energy colony life strenght speed]
 
   ifelse random 100 < 50[ ; 50% de gerar um ou outro
-  create-tamanduas random 2[
+  create-tamanduas random 3[
       set shape "tamandua"
       set color brown
       set size 17
@@ -1133,7 +1114,7 @@ to gerar-predador ;pangolims-own [energy colony life strenght speed]
       set strenght 87
       set speed 1
   ]]
-  [create-pangolims random 4 [
+  [create-pangolims random 5 + 1 [
       set shape "pangolim"
       set color 37
       set size 12
@@ -1208,7 +1189,7 @@ end
 ;== Obstáculos ==
 to setup-obstaculos
    ask patches [
-  if random 10000 < 2[ ;; 10% de chance de o patch ser o centro de uma pedra
+  if random 10000 < random 10[ ;; 2%% de chance de o patch ser o centro de uma pedra base
     ask patches in-radius 3 [ ;; Define os patches ao redor como parte da pedra
       set obstáculo? true
       set pcolor gray ;; Define a cor da pedra
@@ -1256,13 +1237,13 @@ end
 ; Veja a aba 'Info' para o copyright completo e licença.
 @#$#@#$#@
 GRAPHICS-WINDOW
-441
+536
 10
-1268
-838
+1362
+837
 -1
 -1
-7.0
+6.9915
 1
 10
 1
@@ -1300,15 +1281,15 @@ NIL
 1
 
 SLIDER
-31
-106
-221
-139
+32
+104
+222
+137
 diffusion-rate
 diffusion-rate
 0.0
 99.0
-53.0
+55.0
 1.0
 1
 NIL
@@ -1323,7 +1304,7 @@ evaporation-rate
 evaporation-rate
 0.0
 99.0
-57.0
+42.0
 1.0
 1
 NIL
@@ -1355,7 +1336,7 @@ population
 population
 0.0
 200.0
-25.0
+46.0
 1.0
 1
 NIL
@@ -1386,7 +1367,7 @@ MONITOR
 62
 531
 Formiga
-count turtles
+count turtles with [ breed = worker-ants or breed = soldier-ants or breed = queen-ants]
 17
 1
 11
@@ -1421,7 +1402,7 @@ Popsold
 Popsold
 0
 200
-11.0
+25.0
 1
 1
 NIL
@@ -1436,7 +1417,7 @@ nascimentoformiga
 nascimentoformiga
 0
 100
-13.0
+73.0
 1
 1
 NIL
@@ -1451,7 +1432,7 @@ Preçoconstrução
 Preçoconstrução
 0
 200
-51.0
+57.0
 1
 1
 NIL
@@ -1463,7 +1444,7 @@ INPUTBOX
 430
 388
 tamanhoseason
-100.0
+500.0
 1
 0
 Number
@@ -1477,7 +1458,7 @@ chancedomida
 chancedomida
 0
 100
-73.0
+39.0
 1
 1
 NIL
@@ -1492,7 +1473,7 @@ num-predador
 num-predador
 0
 100
-3.0
+7.0
 1
 1
 NIL
@@ -1507,7 +1488,7 @@ chancepredador
 chancepredador
 0
 100
-20.0
+7.0
 1
 1
 NIL
@@ -1520,7 +1501,7 @@ SWITCH
 580
 Predador-moron
 Predador-moron
-1
+0
 1
 -1000
 
@@ -1530,10 +1511,36 @@ INPUTBOX
 220
 588
 chancemor
-20.0
+60.0
 1
 0
 Number
+
+SLIDER
+75
+603
+247
+636
+num-arvore
+num-arvore
+0
+100
+38.0
+1
+1
+NIL
+HORIZONTAL
+
+SWITCH
+276
+466
+410
+499
+arvorerandom
+arvorerandom
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
