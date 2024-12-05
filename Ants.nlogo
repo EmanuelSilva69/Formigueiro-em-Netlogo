@@ -357,14 +357,15 @@ to go
       if total-food > Preçoconstrução [ ; preço para subtrair da comida para gerar formiga
       nascimento
       set food-store food-store - Preçoconstrução
-    ]]]
+    ]attack-rainha]
+      ]
     if colony = blue[
       if color = blue - 2 [
       let total-food2 sum [food-store2] of patches
       if total-food2 > Preçoconstrução [
       nascimento
       set food-store2 food-store2 - Preçoconstrução
-    ]]]
+    ]attack-rainha]]
     if colony = 126[
 
       if color = 126 - 2 [
@@ -372,7 +373,7 @@ to go
       if total-food3 > Preçoconstrução [
       nascimento
       set food-store3 food-store3 - Preçoconstrução
-    ]]
+    ]attack-rainha]
        ]
     if colony = yellow[
       if color = yellow - 2 [
@@ -380,7 +381,7 @@ to go
       if total-food4 > Preçoconstrução [
       nascimento
       set food-store4 food-store4 - Preçoconstrução
-  ]]]
+  ]attack-rainha]]
    ]]
 
 
@@ -1186,6 +1187,25 @@ to fugir-do-predador
     fd 1.5
   ]
 end
+to attack-rainha
+  ask queen-ants [
+    ;; Find nearby enemies
+    let nearby-enemies turtles with [
+      (breed != trees and breed != queen-ants) and  ; Exclude trees and other queens
+      (colony != [colony] of myself) and            ; Ensure it's not from the same colony
+      (distance myself < 3)                         ; Define attack range (3 patches)
+    ]
+
+    ;; Check if there are any enemies nearby
+    if any? nearby-enemies [
+      let target one-of nearby-enemies             ; Pick one enemy
+      face target                                  ; Turn towards the enemy
+      ask target [
+        set life life - [strenght] of myself       ; Reduce the target's life based on queen's strength
+      ]
+    ]
+  ]
+end
 ;== Obstáculos ==
 to setup-obstaculos
    ask patches [
@@ -1336,7 +1356,7 @@ population
 population
 0.0
 200.0
-46.0
+25.0
 1.0
 1
 NIL
@@ -1402,7 +1422,7 @@ Popsold
 Popsold
 0
 200
-25.0
+0.0
 1
 1
 NIL
@@ -1417,7 +1437,7 @@ nascimentoformiga
 nascimentoformiga
 0
 100
-73.0
+22.0
 1
 1
 NIL
@@ -1432,7 +1452,7 @@ Preçoconstrução
 Preçoconstrução
 0
 200
-57.0
+164.0
 1
 1
 NIL
@@ -1444,7 +1464,7 @@ INPUTBOX
 430
 388
 tamanhoseason
-500.0
+600.0
 1
 0
 Number
@@ -1458,7 +1478,7 @@ chancedomida
 chancedomida
 0
 100
-39.0
+50.0
 1
 1
 NIL
@@ -1473,7 +1493,7 @@ num-predador
 num-predador
 0
 100
-7.0
+4.0
 1
 1
 NIL
@@ -1488,7 +1508,7 @@ chancepredador
 chancepredador
 0
 100
-7.0
+3.0
 1
 1
 NIL
@@ -1501,7 +1521,7 @@ SWITCH
 580
 Predador-moron
 Predador-moron
-0
+1
 1
 -1000
 
@@ -1525,7 +1545,7 @@ num-arvore
 num-arvore
 0
 100
-38.0
+18.0
 1
 1
 NIL
@@ -1533,12 +1553,12 @@ HORIZONTAL
 
 SWITCH
 276
-466
+453
 410
-499
+486
 arvorerandom
 arvorerandom
-1
+0
 1
 -1000
 
