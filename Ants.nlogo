@@ -357,7 +357,7 @@ to go
       if total-food > Preçoconstrução [ ; preço para subtrair da comida para gerar formiga
       nascimento
       set food-store food-store - Preçoconstrução
-    ]attack-rainha]
+    ]]
       ]
     if colony = blue[
       if color = blue - 2 [
@@ -365,7 +365,7 @@ to go
       if total-food2 > Preçoconstrução [
       nascimento
       set food-store2 food-store2 - Preçoconstrução
-    ]attack-rainha]]
+    ]]]
     if colony = 126[
 
       if color = 126 - 2 [
@@ -373,7 +373,7 @@ to go
       if total-food3 > Preçoconstrução [
       nascimento
       set food-store3 food-store3 - Preçoconstrução
-    ]attack-rainha]
+    ]]
        ]
     if colony = yellow[
       if color = yellow - 2 [
@@ -381,8 +381,10 @@ to go
       if total-food4 > Preçoconstrução [
       nascimento
       set food-store4 food-store4 - Preçoconstrução
-  ]attack-rainha]]
-   ]]
+  ]]]
+   ]
+  attack-rainha
+  ]
 
 
 
@@ -541,7 +543,7 @@ to patrulha-ou-luta
     let inimigo-atual one-of inimigos-proximos
     face inimigo-atual  ;; Vira-se para o inimigo
     fd 1                ;; Move-se 1 passo em direção ao inimigo
-     if distance  inimigo-atual < 4[
+     if distance  inimigo-atual < 6[
     ask inimigo-atual[
       face self
       set life life - [strenght] of myself
@@ -1188,23 +1190,20 @@ to fugir-do-predador
   ]
 end
 to attack-rainha
-  ask queen-ants [
-    ;; Find nearby enemies
-    let nearby-enemies turtles with [
-      (breed != trees and breed != queen-ants) and  ; Exclude trees and other queens
-      (colony != [colony] of myself) and            ; Ensure it's not from the same colony
-      (distance myself < 3)                         ; Define attack range (3 patches)
-    ]
 
-    ;; Check if there are any enemies nearby
-    if any? nearby-enemies [
-      let target one-of nearby-enemies             ; Pick one enemy
-      face target                                  ; Turn towards the enemy
-      ask target [
-        set life life - [strenght] of myself       ; Reduce the target's life based on queen's strength
-      ]
-    ]
-  ]
+  let inimigos-proximos turtles with [(breed != trees) and (breed = worker-ants or breed = soldier-ants  or breed = pangolims or breed = tamanduas) and
+    (colony != [colony] of myself) and  (distance myself < 7)]
+  if any?  inimigos-proximos ;;pra impedir as formigas de atacarem as arvores
+     [
+    let inimigo-atual one-of inimigos-proximos
+    face inimigo-atual  ;; Vira-se para o inimigo
+
+    ask inimigo-atual[
+      face self
+      set life life - [strenght] of myself
+  ]]
+
+
 end
 ;== Obstáculos ==
 to setup-obstaculos
@@ -1309,7 +1308,7 @@ diffusion-rate
 diffusion-rate
 0.0
 99.0
-55.0
+56.0
 1.0
 1
 NIL
@@ -1356,7 +1355,7 @@ population
 population
 0.0
 200.0
-25.0
+61.0
 1.0
 1
 NIL
@@ -1452,7 +1451,7 @@ Preçoconstrução
 Preçoconstrução
 0
 200
-164.0
+83.0
 1
 1
 NIL
@@ -1478,7 +1477,7 @@ chancedomida
 chancedomida
 0
 100
-50.0
+0.0
 1
 1
 NIL
@@ -1493,7 +1492,7 @@ num-predador
 num-predador
 0
 100
-4.0
+1.0
 1
 1
 NIL
@@ -1508,7 +1507,7 @@ chancepredador
 chancepredador
 0
 100
-3.0
+0.0
 1
 1
 NIL
