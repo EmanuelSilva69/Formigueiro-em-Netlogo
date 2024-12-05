@@ -1,5 +1,5 @@
 ; === INSTRUÇÕES ===
-; === DEFINIÇÃO DE VARIÁVEIS ===
+===DECLARAÇÃO DE VARIAVEIS===
 globals[current-season seasons]       ;; Estação atual (Primavera, Verão, Outono, Inverno)
 breed [worker-ants worker-ant]  ; Formigas Trabalhadoras
 breed [soldier-ants soldier-ant] ; Formigas Guerreiras
