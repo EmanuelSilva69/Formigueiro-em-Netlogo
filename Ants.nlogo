@@ -1,5 +1,5 @@
 ; === INSTRUÇÕES ===
-; === DEFINIÇÃO DE VARIÁVEIS ===
+; ===DECLARAÇÃO DE VARIAVEIS ===
 globals[current-season seasons]       ;; Estação atual (Primavera, Verão, Outono, Inverno)
 breed [worker-ants worker-ant]  ; Formigas Trabalhadoras
 breed [soldier-ants soldier-ant] ; Formigas Guerreiras
@@ -35,10 +35,9 @@ patches-own [
 
 ]
 ; Forma da Formiga ter energia e morrer, além dos atributos que eu criei
-worker-ants-own [energy colony life strenght mutation speed  vitima]
-soldier-ants-own [energy colony life strenght mutation speed role vitima]
-queen-ants-own [energy colony life strenght mutation speed vitima]
-trees-own [energy]
+worker-ants-own [energy colony life strenght mutation speed]
+soldier-ants-own [energy colony life strenght mutation speed role]
+queen-ants-own [energy colony life strenght mutation speed]
 pangolims-own [energy colony life strenght speed]
 tamanduas-own [energy colony life strenght speed]
 lucas-own [life strenght speed]
@@ -57,7 +56,6 @@ to setup
   let colony-colors [violet blue 126 yellow] ; Cada ninho tem uma cor única
     foreach colony-colors [colony-color ->
   create-worker-ants population [           ; cria formigas com base no valor do slider 'population'
-    set vitima false
     set size 1.5                          ; tamanho base
     set color colony-color                       ; vermelho indica que não está carregando comida
     set energy 1000                       ; da a energia da formiga
@@ -65,17 +63,15 @@ to setup
     aplicar-atributos
   ]
     create-soldier-ants popsold [ ;população de soldados
-    set vitima false
     set size 2.5                          ; aumenta o tamanho para melhor visualização
     set color colony-color + 3                      ; formiga soldado é magenta (tirei a cor do site lá) um pouco diferente do trabalhador
     set energy 1000                       ; da a energia da formiga
     set colony colony-color ; atribui a colônia
-    set role "Patrulha"
+    set role "patrolling"
     aplicar-atributos
   ]
 
     create-queen-ants 1 [
-    set vitima false
     set size 4                         ; aumenta o tamanho para melhor visualização
     set color (colony-color - 2)                       ; formiga soldado é magenta (tirei a cor do site lá)
     set energy 1000000                  ; da a energia da formiga
@@ -89,14 +85,12 @@ to setup
     set size 15
     move-to one-of patches with [not any? turtles-here]
     set color green
-    set energy 1000000000000000
 
   ]][ create-trees random 100 [
     set shape "tree"
     set size 15
     move-to one-of patches with [not any? turtles-here]
-    set color green
-      set energy 1000000000000000]]
+    set color green]]
   setup-patches                         ; chama o procedimento para configurar os patches
   setup-food
   ;setup-nest para nest turtle
@@ -182,12 +176,12 @@ to aplicar-atributos ;[violet blue 126 yellow] [energy life strenght speed] bote
     set strenght  23
     ]
 ]
-  ifelse random-float 1 < 0.3 [ ;botei 30% de chance para ver um impacto real, talvez diminua dps.
+  ifelse random-float 1 < chancemutacao [ ;botei 30% de chance para ver um impacto real, talvez diminua dps.
     ; Aplica mutação
     set mutation "yes"
-    set life life * (1 + random-float 1.0 - 1.0) ; aumenta a vida em 100% // ou diminui
-    set strenght strenght * (1 + random-float 2.0 - 2.0) ; Aumenta a força até 200% // ou diminui
-    set speed speed * (1 + random-float 0.5 - 0.5)       ; Aumenta a velocidade até 50% // ou diminui
+    set life life * (1 + random-float 1.0 - random-float 1.0) ; aumenta a vida em 100% // ou diminui
+    set strenght strenght * (1 + random-float 2.0 - random-float 2.0) ; Aumenta a força até 200% // ou diminui
+    set speed speed * (1 + random-float 0.5 - random-float 0.5)       ; Aumenta a velocidade até 50% // ou diminui
   ] [
     set mutation "no"
   ]
@@ -536,7 +530,7 @@ to check-death ;ver se a formiga vai morrer
 end
 to patrulha-ou-luta
   let inimigos-proximos turtles with [(breed != trees) and (breed = worker-ants or breed = soldier-ants or breed = queen-ants or breed = pangolims or breed = tamanduas) and
-    (colony != [colony] of myself) and  (distance myself < 10)]
+    (colony != [colony] of myself) and  (distance myself < 5)]
   ifelse any?  inimigos-proximos ;;pra impedir as formigas de atacarem as arvores
      [
     set role "fighting"      ;; Muda o trabalho para Modo Lutador, pra meter a porrada nos trabalhadores inocentes (que nem a vida real)
@@ -860,99 +854,96 @@ to movimento-soldado
   if role = "patrolling"[
   let closest-nest one-of patches with [
     nest? = true and pcolor = violet
-  ]  let nest-x -16  ;; Define the x-coordinate of the nest
-  let nest-y -36  ;; Define the y-coordinate of the nest
+  ]
+  ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
+  let nest-x -16  ;; Define as coordenadas em x da nest
+  let nest-y -36  ;; Define as coordenadas em y da nest
 
-  ;; Move in a circular pattern by adjusting the heading randomly and moving forward
-  set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  move-forward speed ;; Move forward
+  ;; Move em círculos ajustando o heading com valores aleatórios e andando para frente
+  set heading heading + random 10 ;; Randomiza um pouco o heading para o movimento parecer mais natural
+  move-forward speed ;; Anda para frente
 
-  ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
+  ;; Se o soldado estiver muito próximo da nest, muda de direção
   ifelse distancexy nest-x nest-y < 3 [
-    rt random 90  ;; Turn randomly to avoid staying at the same spot
-    move-forward speed        ;; Move forward
+    rt random 90  ;; Se vira aleatoriamente para evitar ficar parado no mesmo lugar
+    move-forward speed        ;; Anda para frente
   ][
-    ;; Continue patrolling around the defined spot
-    rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    move-forward speed    ;; Move forward
+    ;; Continua partulhando no local determinado
+    rt 15  ;; Rotaciona um pouco para continuar patrulhando em círculo
+    move-forward speed    ;; Anda para frente
   ]]
-
-
 end
+
 to movimento-soldado2
-    if role = "patrolling"[
- let closest-nest one-of patches with [
+  if role = "patrolling"[
+  let closest-nest one-of patches with [
     nest? = true and pcolor = blue
   ]
-  ;; Define a specific spot where the soldier ant will patrol (e.g., the nest location)
-  let nest-x -16  ;; Define the x-coordinate of the nest
-  let nest-y -36  ;; Define the y-coordinate of the nest
+  ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
+  let nest-x -16  ;; Define as coordenadas em x da nest
+  let nest-y -36  ;; Define as coordenadas em y da nest
 
+  ;; Move em círculos ajustando o heading com valores aleatórios e andando para frente
+  set heading heading + random 10 ;; Randomiza um pouco o heading para o movimento parecer mais natural
+  move-forward speed ;; Anda para frente
 
-  ;; Move in a circular pattern by adjusting the heading randomly and moving forward
-  set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  move-forward speed  ;; Move forward
-
-  ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
+  ;; Se o soldado estiver muito próximo da nest, muda de direção
   ifelse distancexy nest-x nest-y < 3 [
-    rt random 90  ;; Turn randomly to avoid staying at the same spot
-    move-forward speed         ;; Move forward
+    rt random 90  ;; Se vira aleatoriamente para evitar ficar parado no mesmo lugar
+    move-forward speed        ;; Anda para frente
   ][
-    ;; Continue patrolling around the defined spot
-    rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    move-forward speed    ;; Move forward
+    ;; Continua partulhando no local determinado
+    rt 15  ;; Rotaciona um pouco para continuar patrulhando em círculo
+    move-forward speed    ;; Anda para frente
   ]]
 end
+
 to movimento-soldado3
-    if role = "patrolling"[
+  if role = "patrolling"[
   let closest-nest one-of patches with [
     nest? = true and pcolor = 126
   ]
-  ;; Define a specific spot where the soldier ant will patrol (e.g., the nest location)
-  let nest-x -16  ;; Define the x-coordinate of the nest
-  let nest-y -36  ;; Define the y-coordinate of the nest
+  ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
+  let nest-x -16  ;; Define as coordenadas em x da nest
+  let nest-y -36  ;; Define as coordenadas em y da nest
 
+  ;; Move em círculos ajustando o heading com valores aleatórios e andando para frente
+  set heading heading + random 10 ;; Randomiza um pouco o heading para o movimento parecer mais natural
+  move-forward speed ;; Anda para frente
 
-  ;; Move in a circular pattern by adjusting the heading randomly and moving forward
-  set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  move-forward speed  ;; Move forward
-
-  ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
+  ;; Se o soldado estiver muito próximo da nest, muda de direção
   ifelse distancexy nest-x nest-y < 3 [
-    rt random 90  ;; Turn randomly to avoid staying at the same spot
-    move-forward speed         ;; Move forward
+    rt random 90  ;; Se vira aleatoriamente para evitar ficar parado no mesmo lugar
+    move-forward speed        ;; Anda para frente
   ][
-    ;; Continue patrolling around the defined spot
-    rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    move-forward speed    ;; Move forward
+    ;; Continua partulhando no local determinado
+    rt 15  ;; Rotaciona um pouco para continuar patrulhando em círculo
+    move-forward speed    ;; Anda para frente
   ]]
 end
+
 to movimento-soldado4
-    if role = "patrolling"[
- let closest-nest one-of patches with [
+  if role = "patrolling"[
+  let closest-nest one-of patches with [
     nest? = true and pcolor = yellow
   ]
-  ;; Define a specific spot where the soldier ant will patrol (e.g., the nest location)
-  let nest-x -16  ;; Define the x-coordinate of the nest
-  let nest-y -36  ;; Define the y-coordinate of the nest
+  ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
+  let nest-x -16  ;; Define as coordenadas em x da nest
+  let nest-y -36  ;; Define as coordenadas em y da nest
 
+  ;; Move em círculos ajustando o heading com valores aleatórios e andando para frente
+  set heading heading + random 10 ;; Randomiza um pouco o heading para o movimento parecer mais natural
+  move-forward speed ;; Anda para frente
 
-  ;; Move in a circular pattern by adjusting the heading randomly and moving forward
-  set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  move-forward speed  ;; Move forward
-
-  ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
+  ;; Se o soldado estiver muito próximo da nest, muda de direção
   ifelse distancexy nest-x nest-y < 3 [
-    rt random 90  ;; Turn randomly to avoid staying at the same spot
-    move-forward speed        ;; Move forward
+    rt random 90  ;; Se vira aleatoriamente para evitar ficar parado no mesmo lugar
+    move-forward speed        ;; Anda para frente
   ][
-    ;; Continue patrolling around the defined spot
-    rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    move-forward speed   ;; Move forward
+    ;; Continua partulhando no local determinado
+    rt 15  ;; Rotaciona um pouco para continuar patrulhando em círculo
+    move-forward speed    ;; Anda para frente
   ]]
-  if role = "fighting"[
-
-  ]
 end
 
 ; === FUNÇÕES AUXILIARES ===
@@ -999,7 +990,7 @@ to-report chemical-scent-at-angle4 [angle]
 end
 ;=== Funções de alteração do clima ===
 to handle-season-change
-  if (ticks mod tamanhoseason = 0) [ ; variável que permite a mudança climática
+  if (ticks mod tamanhoseason = 0 and ticks != 0) [ ; variável que permite a mudança climática
     ;; Atualiza a estação
      let current-index position current-season seasons
      let next-index (current-index + 1) mod length seasons ;pega a próxima estação da lista lá de cima  set seasons ["Primavera" "Verão" "Outono" "Inverno"]
@@ -1220,7 +1211,7 @@ to setup-obstaculos
 end
 to check-obstaculo
   ask turtles [
-  let possible-patch one-of patches in-radius 1 with [not obstáculo?]
+  let possible-patch one-of patches in-radius 2 with [not obstáculo?]
   if possible-patch != nobody [
     move-to possible-patch
   ]
@@ -1421,7 +1412,7 @@ Popsold
 Popsold
 0
 200
-0.0
+10.0
 1
 1
 NIL
@@ -1477,7 +1468,7 @@ chancedomida
 chancedomida
 0
 100
-0.0
+26.0
 1
 1
 NIL
@@ -1536,10 +1527,10 @@ chancemor
 Number
 
 SLIDER
-75
-603
-247
-636
+9
+605
+181
+638
 num-arvore
 num-arvore
 0
@@ -1560,6 +1551,16 @@ arvorerandom
 0
 1
 -1000
+
+CHOOSER
+10
+644
+148
+689
+chancemutacao
+chancemutacao
+0 10 20 30 40 50 60 70 80 90 100
+10
 
 @#$#@#$#@
 ## WHAT IS IT?
