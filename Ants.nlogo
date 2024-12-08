@@ -1215,7 +1215,7 @@ to setup-obstaculos
 end
 to check-obstaculo
   ask turtles [
-  let possible-patch one-of patches in-radius 1 with [not obstáculo?]
+  let possible-patch one-of patches in-radius 2 with [not obstáculo?]
   if possible-patch != nobody [
     move-to possible-patch
   ]
