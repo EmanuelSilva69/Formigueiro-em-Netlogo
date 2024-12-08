@@ -179,9 +179,9 @@ to aplicar-atributos ;[violet blue 126 yellow] [energy life strenght speed] bote
   ifelse random-float 1 < chancemutacao [ ;botei 30% de chance para ver um impacto real, talvez diminua dps.
     ; Aplica mutação
     set mutation "yes"
-    set life life * (1 + random-float 1.0 - random-float 1.0) ; aumenta a vida em 100% // ou diminui
-    set strenght strenght * (1 + random-float 2.0 - random-float 2.0) ; Aumenta a força até 200% // ou diminui
-    set speed speed * (1 + random-float 0.5 - random-float 0.5)       ; Aumenta a velocidade até 50% // ou diminui
+    set life life * (1 + random-float 2.0 -  1.0) ; aumenta a vida em 100% // ou diminui
+    set strenght strenght * (1 + random-float 4.0 -  2.0) ; Aumenta a força até 200% // ou diminui
+    set speed speed * (1 + random-float 1 -  0.5)       ; Aumenta a velocidade até 50% // ou diminui
   ] [
     set mutation "no"
   ]
