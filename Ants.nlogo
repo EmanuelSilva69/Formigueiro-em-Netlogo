@@ -855,6 +855,8 @@ to movimento-soldado
   let closest-nest one-of patches with [
     nest? = true and pcolor = violet
   ]
+   
+
   ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
   let nest-x -16  ;; Define as coordenadas em x da nest
   let nest-y -36  ;; Define as coordenadas em y da nest
@@ -878,7 +880,9 @@ to movimento-soldado2
   if role = "patrolling"[
   let closest-nest one-of patches with [
     nest? = true and pcolor = blue
-  ]
+
+  ] 
+
   ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
   let nest-x -16  ;; Define as coordenadas em x da nest
   let nest-y -36  ;; Define as coordenadas em y da nest
@@ -902,7 +906,9 @@ to movimento-soldado3
   if role = "patrolling"[
   let closest-nest one-of patches with [
     nest? = true and pcolor = 126
-  ]
+
+  ] 
+
   ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
   let nest-x -16  ;; Define as coordenadas em x da nest
   let nest-y -36  ;; Define as coordenadas em y da nest
@@ -926,7 +932,9 @@ to movimento-soldado4
   if role = "patrolling"[
   let closest-nest one-of patches with [
     nest? = true and pcolor = yellow
+
   ]
+  
   ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
   let nest-x -16  ;; Define as coordenadas em x da nest
   let nest-y -36  ;; Define as coordenadas em y da nest
