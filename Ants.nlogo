@@ -176,7 +176,7 @@ to aplicar-atributos ;[violet blue 126 yellow] [energy life strenght speed] bote
     set strenght  23
     ]
 ]
-  ifelse random-float 1 < 0.3 [ ;botei 30% de chance para ver um impacto real, talvez diminua dps.
+  ifelse random-float 1 < chancemutacao [ ;botei 30% de chance para ver um impacto real, talvez diminua dps.
     ; Aplica mutação
     set mutation "yes"
     set life life * (1 + random-float 1.0 - random-float 1.0) ; aumenta a vida em 100% // ou diminui
@@ -854,7 +854,9 @@ to movimento-soldado
   if role = "patrolling"[
   let closest-nest one-of patches with [
     nest? = true and pcolor = violet
-  ] 
+  ]
+   
+
   ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
   let nest-x -16  ;; Define as coordenadas em x da nest
   let nest-y -36  ;; Define as coordenadas em y da nest
@@ -878,7 +880,9 @@ to movimento-soldado2
   if role = "patrolling"[
   let closest-nest one-of patches with [
     nest? = true and pcolor = blue
+
   ] 
+
   ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
   let nest-x -16  ;; Define as coordenadas em x da nest
   let nest-y -36  ;; Define as coordenadas em y da nest
@@ -902,7 +906,9 @@ to movimento-soldado3
   if role = "patrolling"[
   let closest-nest one-of patches with [
     nest? = true and pcolor = 126
+
   ] 
+
   ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
   let nest-x -16  ;; Define as coordenadas em x da nest
   let nest-y -36  ;; Define as coordenadas em y da nest
@@ -926,7 +932,9 @@ to movimento-soldado4
   if role = "patrolling"[
   let closest-nest one-of patches with [
     nest? = true and pcolor = yellow
-  ] 
+
+  ]
+  
   ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
   let nest-x -16  ;; Define as coordenadas em x da nest
   let nest-y -36  ;; Define as coordenadas em y da nest
@@ -1412,7 +1420,7 @@ Popsold
 Popsold
 0
 200
-0.0
+10.0
 1
 1
 NIL
@@ -1468,7 +1476,7 @@ chancedomida
 chancedomida
 0
 100
-0.0
+26.0
 1
 1
 NIL
@@ -1527,10 +1535,10 @@ chancemor
 Number
 
 SLIDER
-75
-603
-247
-636
+9
+605
+181
+638
 num-arvore
 num-arvore
 0
@@ -1551,6 +1559,16 @@ arvorerandom
 0
 1
 -1000
+
+CHOOSER
+10
+644
+148
+689
+chancemutacao
+chancemutacao
+0 10 20 30 40 50 60 70 80 90 100
+10
 
 @#$#@#$#@
 ## WHAT IS IT?
