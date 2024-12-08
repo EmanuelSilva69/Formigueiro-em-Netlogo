@@ -38,7 +38,6 @@ patches-own [
 worker-ants-own [energy colony life strenght mutation speed]
 soldier-ants-own [energy colony life strenght mutation speed role]
 queen-ants-own [energy colony life strenght mutation speed]
-trees-own [energy]
 pangolims-own [energy colony life strenght speed]
 tamanduas-own [energy colony life strenght speed]
 lucas-own [life strenght speed]
@@ -86,14 +85,12 @@ to setup
     set size 15
     move-to one-of patches with [not any? turtles-here]
     set color green
-    set energy 1000000000000000
 
   ]][ create-trees random 100 [
     set shape "tree"
     set size 15
     move-to one-of patches with [not any? turtles-here]
     set color green
-      set energy 1000000000000000]]
   setup-patches                         ; chama o procedimento para configurar os patches
   setup-food
   ;setup-nest para nest turtle
@@ -863,15 +860,15 @@ to movimento-soldado
   let nest-y -36  ;; Define as coordenadas em y da nest
 
   ;; Move em círculos ajustando o heading com valores aleatórios e andando para frente
-  set heading heading + random 10 ;; Randomiza um pocuo o heading para o movimento parecer mais natural
+  set heading heading + random 10 ;; Randomiza um pouco o heading para o movimento parecer mais natural
   move-forward speed ;; Anda para frente
 
   ;; Se o soldado estiver muito próximo da nest, muda de direção
   ifelse distancexy nest-x nest-y < 3 [
     rt random 90  ;; Se vira aleatoriamente para evitar ficar parado no mesmo lugar
-    move-forward speed        ;; Move forward
+    move-forward speed        ;; Anda para frente
   ][
-    ;; Continua partulando no local determinado
+    ;; Continua partulhando no local determinado
     rt 15  ;; Rotaciona um pouco para continuar patrulhando em círculo
     move-forward speed    ;; Anda para frente
   ]]
@@ -887,15 +884,15 @@ to movimento-soldado2
   let nest-y -36  ;; Define as coordenadas em y da nest
 
   ;; Move em círculos ajustando o heading com valores aleatórios e andando para frente
-  set heading heading + random 10 ;; Randomiza um pocuo o heading para o movimento parecer mais natural
+  set heading heading + random 10 ;; Randomiza um pouco o heading para o movimento parecer mais natural
   move-forward speed ;; Anda para frente
 
   ;; Se o soldado estiver muito próximo da nest, muda de direção
   ifelse distancexy nest-x nest-y < 3 [
     rt random 90  ;; Se vira aleatoriamente para evitar ficar parado no mesmo lugar
-    move-forward speed        ;; Move forward
+    move-forward speed        ;; Anda para frente
   ][
-    ;; Continua partulando no local determinado
+    ;; Continua partulhando no local determinado
     rt 15  ;; Rotaciona um pouco para continuar patrulhando em círculo
     move-forward speed    ;; Anda para frente
   ]]
@@ -911,15 +908,15 @@ to movimento-soldado3
   let nest-y -36  ;; Define as coordenadas em y da nest
 
   ;; Move em círculos ajustando o heading com valores aleatórios e andando para frente
-  set heading heading + random 10 ;; Randomiza um pocuo o heading para o movimento parecer mais natural
+  set heading heading + random 10 ;; Randomiza um pouco o heading para o movimento parecer mais natural
   move-forward speed ;; Anda para frente
 
   ;; Se o soldado estiver muito próximo da nest, muda de direção
   ifelse distancexy nest-x nest-y < 3 [
     rt random 90  ;; Se vira aleatoriamente para evitar ficar parado no mesmo lugar
-    move-forward speed        ;; Move forward
+    move-forward speed        ;; Anda para frente
   ][
-    ;; Continua partulando no local determinado
+    ;; Continua partulhando no local determinado
     rt 15  ;; Rotaciona um pouco para continuar patrulhando em círculo
     move-forward speed    ;; Anda para frente
   ]]
@@ -935,20 +932,19 @@ to movimento-soldado4
   let nest-y -36  ;; Define as coordenadas em y da nest
 
   ;; Move em círculos ajustando o heading com valores aleatórios e andando para frente
-  set heading heading + random 10 ;; Randomiza um pocuo o heading para o movimento parecer mais natural
+  set heading heading + random 10 ;; Randomiza um pouco o heading para o movimento parecer mais natural
   move-forward speed ;; Anda para frente
 
   ;; Se o soldado estiver muito próximo da nest, muda de direção
   ifelse distancexy nest-x nest-y < 3 [
     rt random 90  ;; Se vira aleatoriamente para evitar ficar parado no mesmo lugar
-    move-forward speed        ;; Move forward
+    move-forward speed        ;; Anda para frente
   ][
-    ;; Continua partulando no local determinado
+    ;; Continua partulhando no local determinado
     rt 15  ;; Rotaciona um pouco para continuar patrulhando em círculo
     move-forward speed    ;; Anda para frente
   ]]
 end
-
 
 ; === FUNÇÕES AUXILIARES ===
 
