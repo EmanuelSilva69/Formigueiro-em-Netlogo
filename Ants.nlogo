@@ -35,9 +35,9 @@ patches-own [
 
 ]
 ; Forma da Formiga ter energia e morrer, além dos atributos que eu criei
-worker-ants-own [energy colony life strenght mutation speed  vitima]
-soldier-ants-own [energy colony life strenght mutation speed role vitima]
-queen-ants-own [energy colony life strenght mutation speed vitima]
+worker-ants-own [energy colony life strenght mutation speed]
+soldier-ants-own [energy colony life strenght mutation speed role]
+queen-ants-own [energy colony life strenght mutation speed]
 trees-own [energy]
 pangolims-own [energy colony life strenght speed]
 tamanduas-own [energy colony life strenght speed]
@@ -57,7 +57,6 @@ to setup
   let colony-colors [violet blue 126 yellow] ; Cada ninho tem uma cor única
     foreach colony-colors [colony-color ->
   create-worker-ants population [           ; cria formigas com base no valor do slider 'population'
-    set vitima false
     set size 1.5                          ; tamanho base
     set color colony-color                       ; vermelho indica que não está carregando comida
     set energy 1000                       ; da a energia da formiga
@@ -65,7 +64,6 @@ to setup
     aplicar-atributos
   ]
     create-soldier-ants popsold [ ;população de soldados
-    set vitima false
     set size 2.5                          ; aumenta o tamanho para melhor visualização
     set color colony-color + 3                      ; formiga soldado é magenta (tirei a cor do site lá) um pouco diferente do trabalhador
     set energy 1000                       ; da a energia da formiga
@@ -75,7 +73,6 @@ to setup
   ]
 
     create-queen-ants 1 [
-    set vitima false
     set size 4                         ; aumenta o tamanho para melhor visualização
     set color (colony-color - 2)                       ; formiga soldado é magenta (tirei a cor do site lá)
     set energy 1000000                  ; da a energia da formiga
@@ -997,7 +994,7 @@ to-report chemical-scent-at-angle4 [angle]
 end
 ;=== Funções de alteração do clima ===
 to handle-season-change
-  if (ticks mod tamanhoseason = 0) [ ; variável que permite a mudança climática
+  if (ticks mod tamanhoseason = 0 and ticks != 0) [ ; variável que permite a mudança climática
     ;; Atualiza a estação
      let current-index position current-season seasons
      let next-index (current-index + 1) mod length seasons ;pega a próxima estação da lista lá de cima  set seasons ["Primavera" "Verão" "Outono" "Inverno"]
