@@ -90,7 +90,7 @@ to setup
     set shape "tree"
     set size 15
     move-to one-of patches with [not any? turtles-here]
-    set color green
+    set color green]]
   setup-patches                         ; chama o procedimento para configurar os patches
   setup-food
   ;setup-nest para nest turtle
