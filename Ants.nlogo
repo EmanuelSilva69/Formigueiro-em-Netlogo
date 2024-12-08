@@ -68,7 +68,7 @@ to setup
     set color colony-color + 3                      ; formiga soldado é magenta (tirei a cor do site lá) um pouco diferente do trabalhador
     set energy 1000                       ; da a energia da formiga
     set colony colony-color ; atribui a colônia
-    set role "Patrulha"
+    set role "patrolling"
     aplicar-atributos
   ]
 
@@ -857,97 +857,97 @@ to movimento-soldado
   if role = "patrolling"[
   let closest-nest one-of patches with [
     nest? = true and pcolor = violet
-  ]  let nest-x -16  ;; Define the x-coordinate of the nest
-  let nest-y -36  ;; Define the y-coordinate of the nest
+  ] 
+  ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
+  let nest-x -16  ;; Define as coordenadas em x da nest
+  let nest-y -36  ;; Define as coordenadas em y da nest
 
-  ;; Move in a circular pattern by adjusting the heading randomly and moving forward
-  set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  move-forward speed ;; Move forward
+  ;; Move em círculos ajustando o heading com valores aleatórios e andando para frente
+  set heading heading + random 10 ;; Randomiza um pocuo o heading para o movimento parecer mais natural
+  move-forward speed ;; Anda para frente
 
-  ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
+  ;; Se o soldado estiver muito próximo da nest, muda de direção
   ifelse distancexy nest-x nest-y < 3 [
-    rt random 90  ;; Turn randomly to avoid staying at the same spot
+    rt random 90  ;; Se vira aleatoriamente para evitar ficar parado no mesmo lugar
     move-forward speed        ;; Move forward
   ][
-    ;; Continue patrolling around the defined spot
-    rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    move-forward speed    ;; Move forward
+    ;; Continua partulando no local determinado
+    rt 15  ;; Rotaciona um pouco para continuar patrulhando em círculo
+    move-forward speed    ;; Anda para frente
   ]]
-
-
 end
+
 to movimento-soldado2
-    if role = "patrolling"[
- let closest-nest one-of patches with [
+  if role = "patrolling"[
+  let closest-nest one-of patches with [
     nest? = true and pcolor = blue
-  ]
-  ;; Define a specific spot where the soldier ant will patrol (e.g., the nest location)
-  let nest-x -16  ;; Define the x-coordinate of the nest
-  let nest-y -36  ;; Define the y-coordinate of the nest
+  ] 
+  ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
+  let nest-x -16  ;; Define as coordenadas em x da nest
+  let nest-y -36  ;; Define as coordenadas em y da nest
 
+  ;; Move em círculos ajustando o heading com valores aleatórios e andando para frente
+  set heading heading + random 10 ;; Randomiza um pocuo o heading para o movimento parecer mais natural
+  move-forward speed ;; Anda para frente
 
-  ;; Move in a circular pattern by adjusting the heading randomly and moving forward
-  set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  move-forward speed  ;; Move forward
-
-  ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
+  ;; Se o soldado estiver muito próximo da nest, muda de direção
   ifelse distancexy nest-x nest-y < 3 [
-    rt random 90  ;; Turn randomly to avoid staying at the same spot
-    move-forward speed         ;; Move forward
+    rt random 90  ;; Se vira aleatoriamente para evitar ficar parado no mesmo lugar
+    move-forward speed        ;; Move forward
   ][
-    ;; Continue patrolling around the defined spot
-    rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    move-forward speed    ;; Move forward
+    ;; Continua partulando no local determinado
+    rt 15  ;; Rotaciona um pouco para continuar patrulhando em círculo
+    move-forward speed    ;; Anda para frente
   ]]
 end
+
 to movimento-soldado3
-    if role = "patrolling"[
+  if role = "patrolling"[
   let closest-nest one-of patches with [
     nest? = true and pcolor = 126
-  ]
-  ;; Define a specific spot where the soldier ant will patrol (e.g., the nest location)
-  let nest-x -16  ;; Define the x-coordinate of the nest
-  let nest-y -36  ;; Define the y-coordinate of the nest
+  ] 
+  ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
+  let nest-x -16  ;; Define as coordenadas em x da nest
+  let nest-y -36  ;; Define as coordenadas em y da nest
 
+  ;; Move em círculos ajustando o heading com valores aleatórios e andando para frente
+  set heading heading + random 10 ;; Randomiza um pocuo o heading para o movimento parecer mais natural
+  move-forward speed ;; Anda para frente
 
-  ;; Move in a circular pattern by adjusting the heading randomly and moving forward
-  set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  move-forward speed  ;; Move forward
-
-  ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
+  ;; Se o soldado estiver muito próximo da nest, muda de direção
   ifelse distancexy nest-x nest-y < 3 [
-    rt random 90  ;; Turn randomly to avoid staying at the same spot
-    move-forward speed         ;; Move forward
-  ][
-    ;; Continue patrolling around the defined spot
-    rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    move-forward speed    ;; Move forward
-  ]]
-end
-to movimento-soldado4
-    if role = "patrolling"[
- let closest-nest one-of patches with [
-    nest? = true and pcolor = yellow
-  ]
-  ;; Define a specific spot where the soldier ant will patrol (e.g., the nest location)
-  let nest-x -16  ;; Define the x-coordinate of the nest
-  let nest-y -36  ;; Define the y-coordinate of the nest
-
-
-  ;; Move in a circular pattern by adjusting the heading randomly and moving forward
-  set heading heading + random 10 ;; Randomize the heading a bit for a more natural movement
-  move-forward speed  ;; Move forward
-
-  ;; If the soldier ant is too close to the nest, change direction (patrol behavior)
-  ifelse distancexy nest-x nest-y < 3 [
-    rt random 90  ;; Turn randomly to avoid staying at the same spot
+    rt random 90  ;; Se vira aleatoriamente para evitar ficar parado no mesmo lugar
     move-forward speed        ;; Move forward
   ][
-    ;; Continue patrolling around the defined spot
-    rt 15  ;; Rotate by a small amount to keep patrolling in a circle
-    move-forward speed   ;; Move forward
+    ;; Continua partulando no local determinado
+    rt 15  ;; Rotaciona um pouco para continuar patrulhando em círculo
+    move-forward speed    ;; Anda para frente
   ]]
-   end
+end
+
+to movimento-soldado4
+  if role = "patrolling"[
+  let closest-nest one-of patches with [
+    nest? = true and pcolor = yellow
+  ] 
+  ;; Define um lugar específico que o soldado vai patrulhar (isto é, o local da nest)
+  let nest-x -16  ;; Define as coordenadas em x da nest
+  let nest-y -36  ;; Define as coordenadas em y da nest
+
+  ;; Move em círculos ajustando o heading com valores aleatórios e andando para frente
+  set heading heading + random 10 ;; Randomiza um pocuo o heading para o movimento parecer mais natural
+  move-forward speed ;; Anda para frente
+
+  ;; Se o soldado estiver muito próximo da nest, muda de direção
+  ifelse distancexy nest-x nest-y < 3 [
+    rt random 90  ;; Se vira aleatoriamente para evitar ficar parado no mesmo lugar
+    move-forward speed        ;; Move forward
+  ][
+    ;; Continua partulando no local determinado
+    rt 15  ;; Rotaciona um pouco para continuar patrulhando em círculo
+    move-forward speed    ;; Anda para frente
+  ]]
+end
 
 
 ; === FUNÇÕES AUXILIARES ===
