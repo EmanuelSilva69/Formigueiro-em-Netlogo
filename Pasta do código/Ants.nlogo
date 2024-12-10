@@ -924,7 +924,7 @@ to movimento-soldado3
     move-forward speed        ;; Anda para frente
   ][
     ;; Continua partulhando no local determinado
-    rt 15  ;; Rotaciona um pouco para continuar patrulhando em círculo
+    rt 15  ;; Rotaciona para continuar patrulhando em círculo
     move-forward speed    ;; Anda para frente
   ]]
 end
@@ -1032,7 +1032,7 @@ to update-patches-for-season
       set pcolor 43
 
     ]]
-    if current-season = "Outono" [ ; como a cor dai é predominante laranja, tive que modificar a cor base pra n dar problema na hora de aparecer as coisas.
+    if current-season = "Outono" [ ; como a cor é predominante laranja, tive que modificar a cor base pra n dar problema na hora de aparecer as coisas.
       if pcolor = 43[
       set pcolor 23
 
