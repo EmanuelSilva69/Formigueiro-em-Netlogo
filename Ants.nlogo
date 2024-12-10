@@ -93,6 +93,7 @@ to setup
     set color green]]
   setup-patches                         ; chama o procedimento para configurar os patches
   setup-food
+  update-trees
   ;setup-nest para nest turtle
   mover-formiga
   setup-obstaculos
